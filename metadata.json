@@ -1,0 +1,6 @@
+{
+  "name": "Offline Music Player",
+  "description": "A high-fidelity simulation of a modern, minimal Android music player inspired by YouTube Music. 100% offline with library scanning, playlist management, sleep timer, equalizer, and Material You styling.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

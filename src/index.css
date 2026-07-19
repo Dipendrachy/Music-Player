@@ -1,0 +1,186 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-android-dark: #030303;
+  --color-android-card: #121212;
+  --color-yt-red: #ff0033;
+
+  --color-app-bg: var(--app-bg);
+  --color-app-text: var(--app-text);
+  --color-app-card: var(--app-card);
+  --color-app-card-border: var(--app-card-border);
+  --color-app-item-bg: var(--app-item-bg);
+  --color-app-item-border: var(--app-item-border);
+  --color-app-text-title: var(--app-text-title);
+  --color-app-text-muted: var(--app-text-muted);
+  --color-app-text-artist: var(--app-text-artist);
+  --color-app-bottom-nav: var(--app-bottom-nav);
+  --color-app-header: var(--app-header);
+  --color-app-border: var(--app-border);
+}
+
+/* Custom Scrollbar Styles for elegant YTM interface */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Custom glow animations */
+@keyframes pulse-glow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+    filter: blur(24px);
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.85;
+    filter: blur(36px);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 8s infinite ease-in-out;
+}
+
+@keyframes cloud-shift-1 {
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(12%, -15%) scale(1.18); }
+  66% { transform: translate(-10%, 8%) scale(0.92); }
+}
+@keyframes cloud-shift-2 {
+  0%, 100% { transform: translate(0px, 0px) scale(1.12); }
+  50% { transform: translate(-15%, 15%) scale(0.88); }
+}
+@keyframes cloud-shift-3 {
+  0%, 100% { transform: translate(0px, 0px) scale(0.95); }
+  40% { transform: translate(15%, 10%) scale(1.22); }
+  80% { transform: translate(-12%, -8%) scale(0.9); }
+}
+
+.animate-cloud-1 {
+  animation: cloud-shift-1 25s infinite ease-in-out;
+}
+.animate-cloud-2 {
+  animation: cloud-shift-2 30s infinite ease-in-out;
+}
+.animate-cloud-3 {
+  animation: cloud-shift-3 20s infinite ease-in-out;
+}
+
+/* Smooth drag cursor indicator */
+.drag-handle {
+  cursor: grab;
+}
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+@keyframes marquee {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+.animate-marquee-smooth {
+  animation: marquee 16s linear infinite;
+}
+
+:root {
+  --app-bg: #030303;
+  --app-text: #d4d4d8;
+  --app-card: #09090b;
+  --app-card-border: #18181b;
+  --app-item-bg: #18181b;
+  --app-item-border: #27272a;
+  --app-item-hover: #27272a;
+  --app-text-title: #f4f4f5;
+  --app-text-muted: #71717a;
+  --app-text-artist: #a1a1aa;
+  --app-bottom-nav: #111827;
+  --app-header: #000000;
+  --app-border: #18181b;
+}
+
+.theme-light {
+  --app-bg: #f9fafb;
+  --app-text: #1f2937;
+  --app-card: #ffffff;
+  --app-card-border: #e5e7eb;
+  --app-item-bg: #f3f4f6;
+  --app-item-border: #e5e7eb;
+  --app-item-hover: #e5e7eb;
+  --app-text-title: #111827;
+  --app-text-muted: #6b7280;
+  --app-text-artist: #4b5563;
+  --app-bottom-nav: #f3f4f6;
+  --app-header: #ffffff;
+  --app-border: #e5e7eb;
+}
+
+.theme-amoled {
+  --app-bg: #000000;
+  --app-text: #e4e4e7;
+  --app-card: #000000;
+  --app-card-border: #18181b;
+  --app-item-bg: #09090b;
+  --app-item-border: #18181b;
+  --app-item-hover: #18181b;
+  --app-text-title: #ffffff;
+  --app-text-muted: #52525b;
+  --app-text-artist: #a1a1aa;
+  --app-bottom-nav: #000000;
+  --app-header: #000000;
+  --app-border: #18181b;
+}
+
+.dynamic-bg {
+  background-color: var(--app-bg) !important;
+}
+.dynamic-text {
+  color: var(--app-text) !important;
+}
+.dynamic-text-title {
+  color: var(--app-text-title) !important;
+}
+.dynamic-text-muted {
+  color: var(--app-text-muted) !important;
+}
+.dynamic-text-artist {
+  color: var(--app-text-artist) !important;
+}
+.dynamic-card {
+  background-color: var(--app-card) !important;
+  border-color: var(--app-card-border) !important;
+}
+.dynamic-item {
+  background-color: var(--app-item-bg) !important;
+  border-color: var(--app-item-border) !important;
+}
+.dynamic-bottom-nav {
+  background-color: var(--app-bottom-nav) !important;
+}
+.dynamic-header {
+  background-color: var(--app-header) !important;
+}
+.dynamic-border {
+  border-color: var(--app-border) !important;
+}
+
