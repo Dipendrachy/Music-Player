@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Song, Playlist, ThemeType, AppSettings } from './types';
 import { offlineDb, fileStorage } from './services/db';
 import { audioEngine } from './services/audioEngine';
@@ -21,12 +22,17 @@ import MiniPlayer from './components/MiniPlayer';
 import MetadataDialog from './components/MetadataDialog';
 
 // Icons
-import { Play, FolderSync, Plus, FileAudio, ShieldAlert, CheckCircle, UploadCloud, X, Sliders, Home, Library, Folder, FolderOpen, Settings } from 'lucide-react';
+import { Play, FolderSync, Plus, FileAudio, ShieldAlert, CheckCircle, UploadCloud, X, Sliders, Home, Library, Folder, FolderOpen, Settings, Disc, Music } from 'lucide-react';
 
 export default function App() {
   const [songs, setSongs] = useState<Song[]>([]);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [settings, setSettings] = useState<AppSettings>(() => offlineDb.getSettings());
+  
+  // Startup Loading states
+  const [appLoading, setAppLoading] = useState(true);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [loadingStatus, setLoadingStatus] = useState('Initializing offline database...');
   
   const isLight = settings.theme === 'light';
   
@@ -53,6 +59,38 @@ export default function App() {
     total: 0,
     label: ''
   });
+
+  useEffect(() => {
+    // Progress loader for first open
+    const startTime = Date.now();
+    const duration = 2200; // 2.2 seconds loading
+    
+    const loadingInterval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const rawProgress = Math.min((elapsed / duration) * 100, 100);
+      setLoadingProgress(rawProgress);
+
+      if (rawProgress < 20) {
+        setLoadingStatus('Initializing offline database...');
+      } else if (rawProgress < 45) {
+        setLoadingStatus('Loading high-fidelity audio engine...');
+      } else if (rawProgress < 70) {
+        setLoadingStatus('Scanning internal storage tracks...');
+      } else if (rawProgress < 90) {
+        setLoadingStatus('Configuring 10-band equalizer presets...');
+      } else if (rawProgress < 100) {
+        setLoadingStatus('Finalizing local workspace...');
+      } else {
+        setLoadingStatus('Ready to play!');
+        clearInterval(loadingInterval);
+        setTimeout(() => {
+          setAppLoading(false);
+        }, 400);
+      }
+    }, 40);
+
+    return () => clearInterval(loadingInterval);
+  }, []);
 
   useEffect(() => {
     // Initial DB loads
@@ -569,6 +607,135 @@ export default function App() {
     >
       <div className={`w-full h-full flex flex-col overflow-hidden relative ${getThemeClass()}`}>
         
+        {/* Startup Cinematic Loading Screen */}
+        <AnimatePresence>
+          {appLoading && (
+            <motion.div
+              initial={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.6, ease: 'easeInOut' }}
+              className="absolute inset-0 bg-[#070708] z-50 flex flex-col items-center justify-center p-12 select-none"
+            >
+              {/* Dynamic Ambient Color Glows */}
+              <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                {/* Emerald ambient light */}
+                <motion.div
+                  animate={{
+                    scale: [1, 1.25, 0.95, 1.15, 1],
+                    x: [0, 25, -15, 20, 0],
+                    y: [0, -20, 25, -15, 0],
+                    opacity: [0.12, 0.22, 0.14, 0.26, 0.12],
+                  }}
+                  transition={{
+                    repeat: Infinity,
+                    duration: 8,
+                    ease: "easeInOut",
+                  }}
+                  className="absolute -top-1/4 -left-1/4 w-[150%] h-[150%] rounded-full bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.18)_0%,transparent_60%)]"
+                />
+                {/* Teal ambient light */}
+                <motion.div
+                  animate={{
+                    scale: [1, 0.9, 1.2, 0.95, 1],
+                    x: [0, -20, 30, -25, 0],
+                    y: [0, 25, -20, 20, 0],
+                    opacity: [0.08, 0.18, 0.11, 0.22, 0.08],
+                  }}
+                  transition={{
+                    repeat: Infinity,
+                    duration: 10,
+                    ease: "easeInOut",
+                    delay: 1,
+                  }}
+                  className="absolute -bottom-1/4 -right-1/4 w-[150%] h-[150%] rounded-full bg-[radial-gradient(circle_at_center,rgba(20,184,166,0.18)_0%,transparent_60%)]"
+                />
+                {/* Green dynamic highlights */}
+                <motion.div
+                  animate={{
+                    scale: [1, 1.35, 0.8, 1.15, 1],
+                    x: [0, 35, -30, 15, 0],
+                    y: [0, 30, -25, 30, 0],
+                    opacity: [0.06, 0.14, 0.08, 0.18, 0.06],
+                  }}
+                  transition={{
+                    repeat: Infinity,
+                    duration: 12,
+                    ease: "easeInOut",
+                    delay: 2,
+                  }}
+                  className="absolute top-1/4 left-1/4 w-[100%] h-[100%] rounded-full bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.12)_0%,transparent_50%)]"
+                />
+              </div>
+
+              {/* Center Spinning / Pulsing Music Icon Container */}
+              <div className="relative flex items-center justify-center z-10">
+                {/* Outer pulsing ripple 3 */}
+                <motion.div
+                  animate={{ scale: [1, 1.45, 1], opacity: [0.12, 0, 0.12] }}
+                  transition={{ repeat: Infinity, duration: 3.2, ease: "easeInOut" }}
+                  className="absolute w-56 h-56 rounded-full border border-emerald-500/15"
+                />
+                {/* Outer pulsing ripple 2 */}
+                <motion.div
+                  animate={{ scale: [1, 1.28, 1], opacity: [0.18, 0.02, 0.18] }}
+                  transition={{ repeat: Infinity, duration: 2.6, ease: "easeInOut", delay: 0.4 }}
+                  className="absolute w-44 h-44 rounded-full border border-teal-500/20"
+                />
+                {/* Outer pulsing ripple 1 */}
+                <motion.div
+                  animate={{ scale: [1, 1.15, 1], opacity: [0.25, 0.05, 0.25] }}
+                  transition={{ repeat: Infinity, duration: 2, ease: "easeInOut", delay: 0.8 }}
+                  className="absolute w-36 h-36 rounded-full border border-green-500/25"
+                />
+
+                {/* Rotating Inner Disc with glowing rings */}
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
+                  className="w-28 h-28 rounded-full bg-gradient-to-tr from-zinc-950 via-zinc-900 to-zinc-950 border border-zinc-800/80 shadow-[0_0_40px_rgba(16,185,129,0.25)] flex items-center justify-center relative"
+                >
+                  {/* Circular design rings */}
+                  <div className="absolute inset-1.5 rounded-full border border-zinc-800/40" />
+                  <div className="absolute inset-3.5 rounded-full border border-zinc-800/60" />
+                  <div className="absolute inset-6 rounded-full border border-zinc-800/80" />
+                  <div className="absolute inset-8 rounded-full border border-zinc-800" />
+                </motion.div>
+
+                {/* Green color logo from homepage (Emerald circle with black filled play icon) in the absolute center, pulsing */}
+                <motion.div
+                  animate={{
+                    scale: [0.95, 1.12, 0.95],
+                  }}
+                  transition={{
+                    repeat: Infinity,
+                    duration: 2,
+                    ease: "easeInOut"
+                  }}
+                  className="absolute z-20 flex items-center justify-center w-14 h-14 rounded-full bg-emerald-500 shadow-[0_0_25px_rgba(16,185,129,0.45)]"
+                >
+                  <Play className="w-6.5 h-6.5 text-black fill-black ml-1" />
+                </motion.div>
+
+                {/* Floating Micro Music Particles */}
+                <motion.div
+                  animate={{ y: [-4, 4, -4], x: [-2, 2, -2] }}
+                  transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+                  className="absolute -top-6 -right-6 text-emerald-500/40"
+                >
+                  <Music className="w-4 h-4" />
+                </motion.div>
+                <motion.div
+                  animate={{ y: [3, -3, 3], x: [1, -1, 1] }}
+                  transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
+                  className="absolute -bottom-6 -left-6 text-teal-500/35"
+                >
+                  <Disc className="w-4 h-4" />
+                </motion.div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Main top context toolbar (Import / Refresh scanner trigger) */}
         {activeTab !== 'home' && activeTab !== 'equalizer' && activeTab !== 'settings' && activeTab !== 'library' && !activePlaylist && (
           <div className="px-5 py-3.5 bg-black flex items-center justify-between z-10 select-none border-b border-gray-900/40">
