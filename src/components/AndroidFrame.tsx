@@ -44,10 +44,10 @@ export default function AndroidFrame({
       {/* Main Container */}
       <div
         id="android_device_shell"
-        className={`relative flex flex-col bg-[#030303] shadow-[0_24px_50px_-12px_rgba(0,0,0,0.8)] border border-zinc-900 overflow-hidden transition-all duration-500 ease-out ${
+        className={`relative flex flex-col bg-[#030303] shadow-[0_24px_50px_-12px_rgba(0,0,0,0.8)] md:border md:border-zinc-900 overflow-hidden transition-all duration-500 ease-out ${
           isCompactFrame
-            ? 'w-full max-w-[420px] h-[860px] md:rounded-[44px] md:border-[10px] md:border-zinc-900'
-            : 'w-full max-w-[1200px] h-[90vh] md:rounded-3xl border-2 border-zinc-800'
+            ? 'w-full h-screen md:max-w-[390px] md:h-[800px] md:max-h-[88vh] md:rounded-[44px] md:border-[10px] md:border-zinc-900'
+            : 'w-full h-screen md:max-w-[1200px] md:h-[90vh] md:rounded-3xl md:border-2 md:border-zinc-800'
         }`}
       >
         {/* Content Region */}

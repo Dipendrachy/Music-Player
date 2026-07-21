@@ -1,6 +1,6 @@
 {
-  "name": "Offline Music Player",
-  "description": "A high-fidelity simulation of a modern, minimal Android music player inspired by YouTube Music. 100% offline with library scanning, playlist management, sleep timer, equalizer, and Material You styling.",
+  "name": "Android 14 Media System Simulator",
+  "description": "An immersive high-fidelity simulation of the Android 14 Media System, featuring interactive Lock Screen widgets, Quick Settings drawer control grids, Material You themed accent panels, an output device volume swapper, and the trademark animated squiggle wavy seek bar.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
