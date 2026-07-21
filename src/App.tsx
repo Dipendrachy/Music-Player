@@ -10,7 +10,6 @@ import { audioEngine } from './services/audioEngine';
 
 // Subcomponents
 import AndroidFrame from './components/AndroidFrame';
-import AndroidSystemSimulator from './components/AndroidSystemSimulator';
 import Dashboard from './components/Dashboard';
 import LibraryTab from './components/LibraryTab';
 import FolderTab from './components/FolderTab';
@@ -568,14 +567,7 @@ export default function App() {
       onSystemHome={handleSystemHome}
       onSystemRecents={handleSystemRecents}
     >
-      <AndroidSystemSimulator
-        currentSong={currentSong}
-        playbackState={playbackState}
-        songs={songs}
-        onPlaySong={handlePlaySong}
-        onRefresh={refreshCollection}
-      >
-        <div className={`w-full h-full flex flex-col overflow-hidden relative ${getThemeClass()}`}>
+      <div className={`w-full h-full flex flex-col overflow-hidden relative ${getThemeClass()}`}>
         
         {/* Main top context toolbar (Import / Refresh scanner trigger) */}
         {activeTab !== 'home' && activeTab !== 'equalizer' && activeTab !== 'settings' && activeTab !== 'library' && !activePlaylist && (
@@ -791,8 +783,7 @@ export default function App() {
           </div>
         )}
 
-        </div>
-      </AndroidSystemSimulator>
+      </div>
     </AndroidFrame>
   );
 }

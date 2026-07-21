@@ -9,7 +9,6 @@ import { audioEngine } from '../services/audioEngine';
 import { getArtworkColors } from '../data/defaultSongs';
 import { offlineDb } from '../services/db';
 import SongCover, { updateCoverCache } from './SongCover';
-import WavySeekBar from './WavySeekBar';
 import { 
   ChevronDown, Heart, Play, Pause, SkipBack, SkipForward, Shuffle, Repeat, 
   ListMusic, Moon, Gauge, VolumeX, Trash, RefreshCw, Layers, ArrowUp, ArrowDown, Sparkles, Music,
@@ -434,16 +433,37 @@ export default function PlayerView({ currentSong, playbackState, onCollapse, onR
           </div>
         </div>
 
-        {/* Seeking Progress timeline slider (Android 14 Wavy SeekBar) */}
-        <div className="w-full space-y-1 select-none">
-          <WavySeekBar
-            currentTime={currentTime}
-            duration={currentSong.duration || 100}
-            playbackState={playbackState}
-            onSeek={(time) => audioEngine.seek(time)}
-            color={isLight ? '#18181b' : '#ffffff'}
-          />
-          <div className={`flex justify-between text-[10px] font-mono font-bold ${isLight ? 'text-zinc-600' : 'text-zinc-500'} px-0.5 -mt-1`}>
+        {/* Seeking Progress timeline slider (Custom Premium YouTube Music inspired Seeker) */}
+        <div className="w-full space-y-2 select-none">
+          <div className="relative w-full h-5 flex items-center group">
+            {/* Underlying Native Range Input for native browser event loop handling */}
+            <input
+              type="range"
+              min="0"
+              max={currentSong.duration || 100}
+              value={currentTime}
+              onChange={handleSeekChange}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+              title="Seek playback position"
+            />
+            
+            {/* Custom visual progress track */}
+            <div className={`relative w-full h-1 group-hover:h-1.5 ${isLight ? 'bg-zinc-200' : 'bg-zinc-800'} rounded-full transition-all duration-150 pointer-events-none overflow-visible`}>
+              {/* Colored progress bar fill */}
+              <div 
+                className={`absolute top-0 left-0 h-full ${isLight ? 'bg-zinc-900' : 'bg-white'} rounded-full`}
+                style={{ width: `${(currentTime / (currentSong.duration || 100)) * 100}%` }}
+              />
+              {/* YouTube Music style sliding dot thumb indicator */}
+              <div 
+                className={`absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full ${isLight ? 'bg-zinc-900 shadow-[0_0_10px_rgba(0,0,0,0.25)]' : 'bg-white shadow-[0_0_10px_rgba(255,255,255,0.6)]'} opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none`}
+                style={{ 
+                  left: `calc(${(currentTime / (currentSong.duration || 100)) * 100}% - 7px)` 
+                }}
+              />
+            </div>
+          </div>
+          <div className={`flex justify-between text-[10px] font-mono font-bold ${isLight ? 'text-zinc-600' : 'text-zinc-500'} px-0.5`}>
             <span>{formatTime(currentTime)}</span>
             <span>{formatTime(currentSong.duration)}</span>
           </div>

@@ -19,7 +19,7 @@ export default function AndroidFrame({
   const [isCompactFrame, setIsCompactFrame] = useState(true);
 
   return (
-    <div className="min-h-screen bg-[#030303] flex flex-col items-center justify-center p-0 md:p-4 font-sans text-white overflow-hidden transition-all duration-300">
+    <div className="h-[100dvh] md:min-h-screen bg-[#030303] flex flex-col items-center justify-center p-0 md:p-4 font-sans text-white overflow-hidden transition-all duration-300">
       {/* Frame Controls Toggle Bar (Only visible on desktop) */}
       <div className="hidden md:flex items-center gap-3 mb-3 text-xs text-zinc-400 bg-zinc-950 border border-zinc-800/60 px-4 py-2 rounded-full shadow-lg z-50">
         <Smartphone className="w-3.5 h-3.5 text-zinc-500" />
@@ -44,10 +44,10 @@ export default function AndroidFrame({
       {/* Main Container */}
       <div
         id="android_device_shell"
-        className={`relative flex flex-col bg-[#030303] shadow-[0_24px_50px_-12px_rgba(0,0,0,0.8)] md:border md:border-zinc-900 overflow-hidden transition-all duration-500 ease-out ${
+        className={`relative flex flex-col bg-[#030303] shadow-[0_24px_50px_-12px_rgba(0,0,0,0.8)] border border-zinc-900 overflow-hidden transition-all duration-500 ease-out ${
           isCompactFrame
-            ? 'w-full h-screen md:max-w-[390px] md:h-[800px] md:max-h-[88vh] md:rounded-[44px] md:border-[10px] md:border-zinc-900'
-            : 'w-full h-screen md:max-w-[1200px] md:h-[90vh] md:rounded-3xl md:border-2 md:border-zinc-800'
+            ? 'w-full max-w-[420px] h-[100dvh] md:h-[860px] md:rounded-[44px] md:border-[10px] md:border-zinc-900'
+            : 'w-full max-w-[1200px] h-[90vh] md:rounded-3xl border-2 border-zinc-800'
         }`}
       >
         {/* Content Region */}

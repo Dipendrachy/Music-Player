@@ -133,12 +133,12 @@ export default function MiniPlayer({ currentSong, playbackState, onExpand, onRef
 
       {/* Progress Line bar with clean margins */}
       <div className="px-3.5">
-        <div className={`w-full h-[2px] ${isLight ? 'bg-zinc-300/60' : 'bg-zinc-800/50'} relative rounded-full overflow-hidden`}>
+        <div className={`w-full h-[2px] ${isLight ? 'bg-zinc-300/40' : 'bg-zinc-800/50'} relative rounded-full overflow-hidden`}>
           <div
             className="h-full transition-all duration-300"
             style={{ 
               width: `${progressPercent}%`,
-              backgroundColor: isLight ? '#18181b' : '#FFFFFF'
+              backgroundColor: '#FFFFFF'
             }}
           />
         </div>

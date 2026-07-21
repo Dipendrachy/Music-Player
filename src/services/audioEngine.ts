@@ -542,15 +542,6 @@ class AudioEngine {
     return this.state;
   }
 
-  public setVolume(volume: number) {
-    if (this.masterGain) {
-      this.masterGain.gain.value = volume;
-    }
-    if (this.audio) {
-      this.audio.volume = volume;
-    }
-  }
-
   public getShuffle(): boolean {
     return this.shuffleMode;
   }
