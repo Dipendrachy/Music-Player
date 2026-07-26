@@ -15,13 +15,16 @@ class AudioEngine {
   
   // Audio Nodes
   private sourceNode: MediaElementAudioSourceNode | null = null;
+  private subCutoffFilter: BiquadFilterNode | null = null;
   private eqFilters: BiquadFilterNode[] = [];
   private bassBoostFilter: BiquadFilterNode | null = null;
   private pannerNode: StereoPannerNode | null = null;
   private analyserNode: AnalyserNode | null = null;
   private masterGain: GainNode | null = null;
+  private masterLimiter: DynamicsCompressorNode | null = null;
   private virtualizerDelay: DelayNode | null = null;
   private virtualizerGain: GainNode | null = null;
+  private noiseBuffer: AudioBuffer | null = null;
 
   // Queue & State
   private queue: Song[] = [];
@@ -46,6 +49,9 @@ class AudioEngine {
     if (typeof window !== 'undefined') {
       this.audio = new Audio();
       this.audio.preload = 'auto';
+      this.audio.crossOrigin = 'anonymous';
+      // @ts-ignore
+      if ('preservesPitch' in this.audio) this.audio.preservesPitch = true;
       
       // Wire up standard audio element events
       this.audio.addEventListener('timeupdate', () => {
@@ -116,7 +122,7 @@ class AudioEngine {
     if (!this.ctx) {
       // @ts-ignore
       const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      this.ctx = new AudioContextClass();
+      this.ctx = new AudioContextClass({ latencyHint: 'playback' });
       this.setupAudioGraph();
     }
     if (this.ctx.state === 'suspended') {
@@ -130,7 +136,13 @@ class AudioEngine {
     // Create source from audio element
     this.sourceNode = this.ctx.createMediaElementSource(this.audio);
 
-    // Create Equalizer filters (5 bands: 60Hz, 230Hz, 910Hz, 4kHz, 14kHz)
+    // 1. Sub-bass Cut Filter (Highpass 25Hz to protect phone speaker coils from sub-rumble distortion)
+    this.subCutoffFilter = this.ctx.createBiquadFilter();
+    this.subCutoffFilter.type = 'highpass';
+    this.subCutoffFilter.frequency.value = 25;
+    this.subCutoffFilter.Q.value = 0.7;
+
+    // 2. Create Equalizer filters (5 bands: 60Hz, 230Hz, 910Hz, 4kHz, 14kHz)
     const frequencies = [60, 230, 910, 4000, 14000];
     this.eqFilters = frequencies.map((freq, i) => {
       const filter = this.ctx!.createBiquadFilter();
@@ -147,35 +159,46 @@ class AudioEngine {
       return filter;
     });
 
-    // Create Bass Boost Filter (Lowshelf at 80Hz)
+    // 3. Create Bass Boost Filter (Lowshelf at 80Hz)
     this.bassBoostFilter = this.ctx.createBiquadFilter();
     this.bassBoostFilter.type = 'lowshelf';
     this.bassBoostFilter.frequency.value = 80;
     this.bassBoostFilter.gain.value = 0;
 
-    // Create Panner (Left/Right balance)
+    // 4. Create Panner (Left/Right balance)
     this.pannerNode = this.ctx.createStereoPanner();
     this.pannerNode.pan.value = 0;
 
-    // Create Stereo Virtualizer (Delay + feedback mix)
+    // 5. Create Stereo Virtualizer (Delay + feedback mix)
     this.virtualizerDelay = this.ctx.createDelay();
-    this.virtualizerDelay.delayTime.value = 0.025; // 25ms delay for Haas effect
+    this.virtualizerDelay.delayTime.value = 0.025; // 25ms delay for Haas spatial width
     this.virtualizerGain = this.ctx.createGain();
     this.virtualizerGain.gain.value = 0;
 
-    // Create Analyser
+    // 6. Create Analyser Node
     this.analyserNode = this.ctx.createAnalyser();
     this.analyserNode.fftSize = 128; // small size for snappy fluid visualizer
 
-    // Create Master Gain Node
+    // 7. Create Master Gain Node (with headroom scaling)
     this.masterGain = this.ctx.createGain();
-    this.masterGain.gain.value = 1.0;
+    this.masterGain.gain.value = 0.90;
+
+    // 8. Create Master Brickwall Compressor/Limiter
+    // Prevents digital clipping & distortion on mobile DACs when EQ bands are boosted
+    this.masterLimiter = this.ctx.createDynamicsCompressor();
+    this.masterLimiter.threshold.setValueAtTime(-6.0, this.ctx.currentTime);
+    this.masterLimiter.knee.setValueAtTime(12.0, this.ctx.currentTime);
+    this.masterLimiter.ratio.setValueAtTime(12.0, this.ctx.currentTime);
+    this.masterLimiter.attack.setValueAtTime(0.003, this.ctx.currentTime);
+    this.masterLimiter.release.setValueAtTime(0.15, this.ctx.currentTime);
 
     // Connect Node Pipeline
-    // Source -> BassBoost -> EQ Filters Chain -> Virtualizer -> Panner -> Analyser -> Master Gain -> Destination
+    // Source -> SubCut -> BassBoost -> EQ Filters Chain -> Virtualizer -> Panner -> Analyser -> Master Gain -> Master Limiter -> Destination
     let lastNode: AudioNode = this.sourceNode;
+
+    lastNode.connect(this.subCutoffFilter);
+    lastNode = this.subCutoffFilter;
     
-    // Connect EQ Filters chain
     lastNode.connect(this.bassBoostFilter);
     lastNode = this.bassBoostFilter;
 
@@ -184,8 +207,7 @@ class AudioEngine {
       lastNode = filter;
     });
 
-    // Simple delay feedback virtualizer node connection
-    // Splitting stereo or feeding a delay mixed back
+    // Virtualizer splitter/merger
     const splitter = this.ctx.createChannelSplitter(2);
     const merger = this.ctx.createChannelMerger(2);
     
@@ -194,16 +216,17 @@ class AudioEngine {
     // Left channel goes directly to merger
     splitter.connect(merger, 0, 0);
     
-    // Right channel goes through delay node to create spatial width
+    // Right channel goes through delay node for spatial stereo depth
     splitter.connect(this.virtualizerDelay, 1);
     this.virtualizerDelay.connect(this.virtualizerGain);
     this.virtualizerGain.connect(merger, 0, 1);
 
-    // Recombine and connect to panner
+    // Recombine and connect to master chain
     merger.connect(this.pannerNode);
     this.pannerNode.connect(this.analyserNode);
     this.analyserNode.connect(this.masterGain);
-    this.masterGain.connect(this.ctx.destination);
+    this.masterGain.connect(this.masterLimiter);
+    this.masterLimiter.connect(this.ctx.destination);
 
     // Apply active EQ/settings
     this.applyEqualizerFromDb();
@@ -216,24 +239,36 @@ class AudioEngine {
       this.eqFilters.forEach(f => f.gain.value = 0);
       if (this.bassBoostFilter) this.bassBoostFilter.gain.value = 0;
       if (this.virtualizerGain) this.virtualizerGain.gain.value = 0;
+      if (this.masterGain) this.masterGain.gain.value = 0.90;
       return;
     }
+
+    let maxBoost = 0;
 
     // Apply bands
     this.eqFilters.forEach((filter, i) => {
       if (filter && eq.bands[i] !== undefined) {
         filter.gain.value = eq.bands[i];
+        if (eq.bands[i] > maxBoost) maxBoost = eq.bands[i];
       }
     });
 
-    // Bass boost maps 0-100 to 0-12 dB
+    // Bass boost maps 0-100 to 0-10 dB
     if (this.bassBoostFilter) {
-      this.bassBoostFilter.gain.value = (eq.bassBoost / 100) * 12;
+      const boostDb = (eq.bassBoost / 100) * 10;
+      this.bassBoostFilter.gain.value = boostDb;
+      if (boostDb > maxBoost) maxBoost = boostDb;
     }
 
     // Virtualizer delay mix level
     if (this.virtualizerGain) {
-      this.virtualizerGain.gain.value = (eq.virtualizer / 100) * 0.8;
+      this.virtualizerGain.gain.value = (eq.virtualizer / 100) * 0.4;
+    }
+
+    // Dynamic Headroom Scaling: Scale master gain so high EQ boosts never saturate the audio pipeline
+    if (this.masterGain) {
+      const headroomScale = Math.max(0.45, 0.90 - (maxBoost * 0.03));
+      this.masterGain.gain.value = headroomScale;
     }
   }
 
@@ -651,6 +686,20 @@ class AudioEngine {
     return this.sleepTimerSeconds;
   }
 
+  // Cached Noise Buffer for drums & vinyl textures (avoids per-beat garbage collection allocation)
+  private getNoiseBuffer(): AudioBuffer | null {
+    if (!this.ctx) return null;
+    if (!this.noiseBuffer) {
+      const bufferSize = this.ctx.sampleRate * 2;
+      this.noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+      const data = this.noiseBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+    }
+    return this.noiseBuffer;
+  }
+
   // ==========================================
   // PROCEDURAL AUDIO SYNTHESIZERS (WEB AUDIO)
   // ==========================================
@@ -661,8 +710,8 @@ class AudioEngine {
 
     // Master volume node for synthesized tracks inside our master graph
     const synthGain = this.ctx.createGain();
-    synthGain.gain.setValueAtTime(0.5, this.ctx.currentTime);
-    synthGain.connect(this.bassBoostFilter || this.ctx.destination);
+    synthGain.gain.setValueAtTime(0.45, this.ctx.currentTime);
+    synthGain.connect(this.subCutoffFilter || this.bassBoostFilter || this.ctx.destination);
     this.synthActiveNodes.push(synthGain);
 
     const stepTime = () => (60 / this.synthBpm) / 4; // duration of a 16th note
@@ -718,42 +767,39 @@ class AudioEngine {
       osc.connect(gain);
       gain.connect(outputNode);
 
-      osc.frequency.setValueAtTime(isLofi ? 55 : 65, time);
-      osc.frequency.exponentialRampToValueAtTime(0.01, time + 0.15);
+      osc.frequency.setValueAtTime(isLofi ? 60 : 70, time);
+      osc.frequency.exponentialRampToValueAtTime(0.001, time + 0.16);
       
-      gain.gain.setValueAtTime(isLofi ? 0.35 : 0.5, time);
-      gain.gain.exponentialRampToValueAtTime(0.01, time + 0.15);
+      gain.gain.setValueAtTime(isLofi ? 0.32 : 0.45, time);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.16);
 
       osc.start(time);
-      osc.stop(time + 0.2);
+      osc.stop(time + 0.18);
     }
 
     if (hasSnare) {
-      // Synthesized noise snare
-      const bufferSize = this.ctx.sampleRate * 0.15;
-      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1;
+      const buffer = this.getNoiseBuffer();
+      if (buffer) {
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(isLofi ? 850 : 1100, time);
+        filter.Q.value = 1.2;
+
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(isLofi ? 0.10 : 0.18, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.14);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(outputNode);
+
+        const offset = (step * 0.1) % 1.5;
+        noise.start(time, offset);
+        noise.stop(time + 0.15);
       }
-
-      const noise = this.ctx.createBufferSource();
-      noise.buffer = buffer;
-
-      const filter = this.ctx.createBiquadFilter();
-      filter.type = 'bandpass';
-      filter.frequency.setValueAtTime(isLofi ? 800 : 1000, time);
-
-      const gain = this.ctx.createGain();
-      gain.gain.setValueAtTime(isLofi ? 0.12 : 0.2, time);
-      gain.gain.exponentialRampToValueAtTime(0.01, time + 0.12);
-
-      noise.connect(filter);
-      filter.connect(gain);
-      gain.connect(outputNode);
-
-      noise.start(time);
-      noise.stop(time + 0.15);
     }
 
     if (hasHat) {

@@ -52,8 +52,8 @@ function VerticalBand({ gain, label, desc, onChange, enabled }: VerticalBandProp
   return (
     <div className="flex flex-col items-center flex-1 h-full select-none">
       {/* Numeric Indicator */}
-      <span className={`font-mono text-[9px] font-bold tracking-tighter mb-2 tabular-nums transition-colors duration-300 ${
-        enabled ? (gain !== 0 ? 'text-white' : 'text-zinc-500') : 'text-zinc-700'
+      <span className={`font-mono text-xs font-bold tracking-tighter mb-2 tabular-nums transition-colors duration-300 ${
+        enabled ? (gain !== 0 ? 'text-white' : 'text-zinc-400') : 'text-zinc-600'
       }`}>
         {gain > 0 ? `+${gain}` : gain}
       </span>
@@ -61,16 +61,16 @@ function VerticalBand({ gain, label, desc, onChange, enabled }: VerticalBandProp
       {/* Vertical Track Area */}
       <div 
         onPointerDown={handlePointerDown}
-        className={`flex-1 w-8 flex justify-center items-center relative touch-none ${
+        className={`flex-1 w-10 flex justify-center items-center relative touch-none ${
           enabled ? 'cursor-ns-resize group' : 'cursor-not-allowed'
         }`}
       >
         {/* Track Line */}
-        <div className={`w-[2px] h-full rounded-full transition-colors relative ${
+        <div className={`w-[3px] h-full rounded-full transition-colors relative ${
           enabled ? 'bg-zinc-800 group-hover:bg-zinc-700' : 'bg-zinc-900'
         }`}>
           {/* Subtle Zero Center-line tick */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-[1px] bg-zinc-700/40" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-[1.5px] bg-zinc-600/60" />
           
           {/* Active Highlight Fill from Center */}
           {enabled && (
@@ -85,22 +85,22 @@ function VerticalBand({ gain, label, desc, onChange, enabled }: VerticalBandProp
           
           {/* Handle/Knob */}
           <div 
-            className={`absolute left-1/2 -translate-x-1/2 w-3 h-3 rounded-full shadow-md border transition-all ${
+            className={`absolute left-1/2 -translate-x-1/2 w-4 h-4 rounded-full shadow-md border transition-all ${
               enabled 
                 ? 'bg-white border-zinc-950 scale-100 group-hover:scale-110 active:scale-125 active:bg-white' 
                 : 'bg-zinc-800 border-zinc-950 scale-90'
             }`}
-            style={{ bottom: `calc(${percent}% - 6px)` }}
+            style={{ bottom: `calc(${percent}% - 8px)` }}
           />
         </div>
       </div>
 
       {/* Frequency Labels */}
-      <span className={`font-sans font-bold text-[10px] mt-2.5 transition-colors duration-300 ${
-        enabled ? 'text-zinc-300' : 'text-zinc-600'
+      <span className={`font-sans font-bold text-xs mt-3 transition-colors duration-300 ${
+        enabled ? 'text-zinc-200' : 'text-zinc-500'
       }`}>{label}</span>
-      <span className={`text-[7.5px] text-center font-medium leading-none tracking-tight mt-0.5 transition-colors duration-300 ${
-        enabled ? 'text-zinc-500' : 'text-zinc-700'
+      <span className={`text-[9px] text-center font-medium tracking-tight mt-0.5 transition-colors duration-300 ${
+        enabled ? 'text-zinc-400' : 'text-zinc-600'
       }`}>{desc}</span>
     </div>
   );
@@ -238,15 +238,15 @@ export default function EqualizerTab() {
       
       {/* Title Header */}
       <div className="flex items-center justify-between mb-5 select-none">
-        <div className="flex items-center gap-2">
-          <Sliders className="w-4 h-4 text-zinc-400" />
-          <h1 className="font-sans font-semibold text-xs tracking-wide text-zinc-100">Equalizer &amp; DSP</h1>
+        <div className="flex items-center gap-2.5">
+          <Sliders className="w-5 h-5 text-zinc-300" />
+          <h1 className="font-sans font-bold text-sm tracking-wide text-zinc-100">Equalizer &amp; DSP</h1>
         </div>
         
         {/* Toggle master */}
         <button
           onClick={handleEnabledToggle}
-          className={`px-3 py-1 rounded-full text-[9px] font-bold tracking-wider border transition-all ${
+          className={`px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider border transition-all ${
             eq.enabled 
               ? 'bg-white border-white text-black shadow-sm' 
               : 'bg-zinc-950 border-zinc-900 text-zinc-500'
@@ -260,18 +260,18 @@ export default function EqualizerTab() {
         
         {/* Modern Minimalistic Preset Chip Row */}
         <div className={`space-y-2 select-none transition-opacity duration-300 ${eq.enabled ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
-          <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest block">Sound Signature</span>
-          <div className="flex flex-wrap gap-1.5">
+          <span className="text-xs text-zinc-400 font-bold uppercase tracking-wider block">Sound Signature</span>
+          <div className="flex flex-wrap gap-2">
             {Object.keys(presets).map((p) => {
               const isSelected = eq.preset === p;
               return (
                 <button
                   key={p}
                   onClick={() => handlePresetChange(p)}
-                  className={`px-2.5 py-1.5 rounded-lg text-[9px] font-semibold tracking-wide transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all ${
                     isSelected 
-                      ? 'bg-white text-black font-bold scale-[1.02]' 
-                      : 'bg-zinc-950 hover:bg-zinc-900 text-zinc-400 border border-zinc-900/60 hover:text-zinc-200'
+                      ? 'bg-white text-black font-extrabold scale-[1.02]' 
+                      : 'bg-zinc-950 hover:bg-zinc-900 text-zinc-300 border border-zinc-800 hover:text-zinc-100'
                   }`}
                 >
                   {p}
@@ -280,10 +280,10 @@ export default function EqualizerTab() {
             })}
             <button
               onClick={() => handlePresetChange('Custom')}
-              className={`px-2.5 py-1.5 rounded-lg text-[9px] font-semibold tracking-wide transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all ${
                 eq.preset === 'Custom' 
-                  ? 'bg-white text-black font-bold scale-[1.02]' 
-                  : 'bg-zinc-950 hover:bg-zinc-900 text-zinc-400 border border-zinc-900/60 hover:text-zinc-200'
+                  ? 'bg-white text-black font-extrabold scale-[1.02]' 
+                  : 'bg-zinc-950 hover:bg-zinc-900 text-zinc-300 border border-zinc-800 hover:text-zinc-100'
               }`}
             >
               Custom

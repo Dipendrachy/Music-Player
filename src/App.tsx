@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Song, Playlist, ThemeType, AppSettings } from './types';
 import { offlineDb, fileStorage } from './services/db';
 import { audioEngine } from './services/audioEngine';
@@ -21,7 +21,7 @@ import MiniPlayer from './components/MiniPlayer';
 import MetadataDialog from './components/MetadataDialog';
 
 // Icons
-import { Play, FolderSync, Plus, FileAudio, ShieldAlert, CheckCircle, UploadCloud, X, Sliders, Home, Library, Folder, FolderOpen, Settings } from 'lucide-react';
+import { Play, FolderSync, Plus, FileAudio, ShieldAlert, CheckCircle, UploadCloud, X, Sliders, Home, Library, Folder, FolderOpen, Settings, ChevronLeft } from 'lucide-react';
 
 export default function App() {
   const [songs, setSongs] = useState<Song[]>([]);
@@ -35,6 +35,37 @@ export default function App() {
   const [activePlaylist, setActivePlaylist] = useState<Playlist | null>(null);
   const [isPlayerExpanded, setIsPlayerExpanded] = useState(false);
   const [editingMetadataSong, setEditingMetadataSong] = useState<Song | null>(null);
+
+  // Controlled Folder & Settings path states for edge swipe back support
+  const [folderPath, setFolderPath] = useState<string[]>([]);
+  const [settingsCategory, setSettingsCategory] = useState<'root' | 'library' | 'playback' | 'display' | 'storage'>('root');
+
+  // Edge Swipe Back Gesture Indicator State
+  const [swipeIndicator, setSwipeIndicator] = useState<{
+    active: boolean;
+    edge: 'left' | 'right';
+    distance: number;
+    thresholdMet: boolean;
+    currentY: number;
+    triggerPulse: boolean;
+  }>({
+    active: false,
+    edge: 'left',
+    distance: 0,
+    thresholdMet: false,
+    currentY: 300,
+    triggerPulse: false,
+  });
+
+  const touchStartRef = useRef<{
+    x: number;
+    y: number;
+    time: number;
+    edge: 'left' | 'right' | 'none';
+    active: boolean;
+  }>({ x: 0, y: 0, time: 0, edge: 'none', active: false });
+
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   // Active Playback states (synced with AudioEngine)
   const [currentSong, setCurrentSong] = useState<Song | null>(null);
@@ -53,6 +84,203 @@ export default function App() {
     total: 0,
     label: ''
   });
+
+  // Synchronize native phone status bar theme color with active app theme
+  useEffect(() => {
+    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (!metaThemeColor) {
+      metaThemeColor = document.createElement('meta');
+      metaThemeColor.setAttribute('name', 'theme-color');
+      document.head.appendChild(metaThemeColor);
+    }
+
+    let targetColor = '#0f0f10';
+    if (isPlayerExpanded) {
+      targetColor = '#0a0a0c';
+    } else if (settings.theme === 'light') {
+      targetColor = '#f9fafb';
+    } else if (settings.theme === 'amoled') {
+      targetColor = '#000000';
+    }
+
+    metaThemeColor.setAttribute('content', targetColor);
+  }, [settings.theme, isPlayerExpanded]);
+
+  // System / Edge Back Handler (pops top layer of navigation stack)
+  const handleSystemBack = (): boolean => {
+    if (isPlayerExpanded) {
+      setIsPlayerExpanded(false);
+      return true;
+    }
+    if (editingMetadataSong) {
+      setEditingMetadataSong(null);
+      return true;
+    }
+    if (showUploader) {
+      setShowUploader(false);
+      return true;
+    }
+    if (activePlaylist) {
+      setActivePlaylist(null);
+      return true;
+    }
+    if (activeTab === 'folders' && folderPath.length > 0) {
+      setFolderPath((prev) => prev.slice(0, -1));
+      return true;
+    }
+    if (activeTab === 'settings' && settingsCategory !== 'root') {
+      setSettingsCategory('root');
+      return true;
+    }
+    if (activeTab !== 'home') {
+      setActiveTab('home');
+      return true;
+    }
+    return false; // Already at home root view
+  };
+
+  const handleSystemHome = () => {
+    setIsPlayerExpanded(false);
+    setEditingMetadataSong(null);
+    setShowUploader(false);
+    setActivePlaylist(null);
+    setFolderPath([]);
+    setSettingsCategory('root');
+    setActiveTab('home');
+  };
+
+  const handleSystemRecents = () => {
+    // Recents feedback simulation
+  };
+
+  // Synchronize browser / phone history back button with internal navigation hierarchy
+  useEffect(() => {
+    window.history.pushState({ page: 'app' }, '');
+    const handlePopState = (e: PopStateEvent) => {
+      const handled = handleSystemBack();
+      if (handled) {
+        window.history.pushState({ page: 'app' }, '');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [
+    isPlayerExpanded,
+    editingMetadataSong,
+    showUploader,
+    activePlaylist,
+    activeTab,
+    folderPath,
+    settingsCategory,
+  ]);
+
+  // Touch and Pointer Event Listeners for Edge Swipe Detection
+  const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
+    const clientX = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
+
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const relativeX = clientX - rect.left;
+    const containerWidth = rect.width;
+
+    // Detect if swipe starts near left edge or right edge (within ~28% or 100px)
+    let edge: 'left' | 'right' | 'none' = 'none';
+    if (relativeX <= Math.min(100, containerWidth * 0.28)) {
+      edge = 'left';
+    } else if (relativeX >= containerWidth - Math.min(100, containerWidth * 0.28)) {
+      edge = 'right';
+    } else {
+      // General horizontal gesture zone fallback
+      edge = relativeX < containerWidth / 2 ? 'left' : 'right';
+    }
+
+    touchStartRef.current = {
+      x: clientX,
+      y: clientY,
+      time: Date.now(),
+      edge,
+      active: true,
+    };
+  };
+
+  const handleTouchMove = (e: React.TouchEvent | React.MouseEvent) => {
+    if (!touchStartRef.current.active) return;
+
+    const clientX = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
+
+    const dx = clientX - touchStartRef.current.x;
+    const dy = clientY - touchStartRef.current.y;
+
+    // Ensure horizontal gesture intent (dx larger than dy)
+    if (Math.abs(dx) < 10 || Math.abs(dy) > Math.abs(dx) * 0.85) {
+      if (swipeIndicator.active && Math.abs(dy) > Math.abs(dx)) {
+        setSwipeIndicator((prev) => ({ ...prev, active: false }));
+      }
+      return;
+    }
+
+    const isLeftEdgeSwipe = touchStartRef.current.edge === 'left' && dx > 12;
+    const isRightEdgeSwipe = touchStartRef.current.edge === 'right' && dx < -12;
+
+    if (isLeftEdgeSwipe || isRightEdgeSwipe) {
+      const distance = Math.abs(dx);
+      const thresholdMet = distance >= 50;
+
+      setSwipeIndicator({
+        active: true,
+        edge: isLeftEdgeSwipe ? 'left' : 'right',
+        distance,
+        thresholdMet,
+        currentY: clientY,
+        triggerPulse: false,
+      });
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartRef.current.active) return;
+    touchStartRef.current.active = false;
+
+    if (swipeIndicator.active) {
+      if (swipeIndicator.thresholdMet) {
+        // Trigger back action
+        const handled = handleSystemBack();
+        if (navigator.vibrate) {
+          try {
+            navigator.vibrate(15);
+          } catch (e) {}
+        }
+
+        // Brief trigger pulse animation
+        setSwipeIndicator((prev) => ({
+          ...prev,
+          triggerPulse: true,
+        }));
+        setTimeout(() => {
+          setSwipeIndicator({
+            active: false,
+            edge: 'left',
+            distance: 0,
+            thresholdMet: false,
+            currentY: 300,
+            triggerPulse: false,
+          });
+        }, 220);
+      } else {
+        // Did not reach threshold
+        setSwipeIndicator({
+          active: false,
+          edge: 'left',
+          distance: 0,
+          thresholdMet: false,
+          currentY: 300,
+          triggerPulse: false,
+        });
+      }
+    }
+  };
 
   useEffect(() => {
     // Initial DB loads
@@ -529,28 +757,6 @@ export default function App() {
     }
   };
 
-  // SYSTEM EMULATOR BACK NAVIGATION CONTROLLER
-  const handleSystemBack = () => {
-    if (isPlayerExpanded) {
-      setIsPlayerExpanded(false);
-    } else if (activePlaylist) {
-      setActivePlaylist(null);
-    } else if (activeTab !== 'home') {
-      setActiveTab('home');
-    }
-  };
-
-  const handleSystemHome = () => {
-    setIsPlayerExpanded(false);
-    setActivePlaylist(null);
-    setActiveTab('home');
-  };
-
-  const handleSystemRecents = () => {
-    // Show a quick storage status feedback
-    alert(`Emulated Offline Storage Info:\n• Indexed tracks: ${songs.length}\n• Playlists: ${playlists.length}\n• History size: ${offlineDb.getHistory().length}`);
-  };
-
   const activeSettings = settings;
 
   // Convert settings theme selection into visual class selectors
@@ -567,8 +773,52 @@ export default function App() {
       onSystemHome={handleSystemHome}
       onSystemRecents={handleSystemRecents}
     >
-      <div className={`w-full h-full flex flex-col overflow-hidden relative ${getThemeClass()}`}>
-        
+      <div 
+        ref={containerRef}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchEnd}
+        onPointerDown={handleTouchStart}
+        onPointerMove={handleTouchMove}
+        onPointerUp={handleTouchEnd}
+        onPointerCancel={handleTouchEnd}
+        className={`w-full h-full flex flex-col overflow-hidden relative select-none touch-pan-y ${getThemeClass()}`}
+      >
+        {/* Animated Mobile Edge Swipe Back Indicator Overlay */}
+        {swipeIndicator.active && (
+          <div
+            className={`absolute z-50 pointer-events-none flex items-center justify-center transition-all duration-75 ${
+              swipeIndicator.edge === 'left' ? 'left-0 rounded-r-full' : 'right-0 rounded-l-full'
+            }`}
+            style={{
+              top: `${Math.max(60, Math.min(window.innerHeight - 100, swipeIndicator.currentY - 28))}px`,
+              height: '56px',
+              width: `${Math.min(68, Math.max(38, swipeIndicator.distance * 0.75))}px`,
+              transform:
+                swipeIndicator.edge === 'left'
+                  ? `translateX(${Math.min(32, swipeIndicator.distance * 0.35)}px)`
+                  : `translateX(-${Math.min(32, swipeIndicator.distance * 0.35)}px)`,
+            }}
+          >
+            <div
+              className={`w-full h-full flex items-center justify-center rounded-full transition-all duration-150 shadow-2xl backdrop-blur-md border ${
+                swipeIndicator.triggerPulse
+                  ? 'bg-emerald-500 text-black border-emerald-400 scale-125 shadow-emerald-500/50'
+                  : swipeIndicator.thresholdMet
+                  ? 'bg-white text-black border-white scale-110 shadow-white/40'
+                  : 'bg-zinc-900/90 text-zinc-300 border-zinc-700/80 scale-100'
+              }`}
+            >
+              <ChevronLeft
+                className={`w-6 h-6 transition-transform ${
+                  swipeIndicator.edge === 'right' ? 'rotate-180' : ''
+                } ${swipeIndicator.thresholdMet ? 'scale-125' : ''}`}
+              />
+            </div>
+          </div>
+        )}
+
         {/* Main top context toolbar (Import / Refresh scanner trigger) */}
         {activeTab !== 'home' && activeTab !== 'equalizer' && activeTab !== 'settings' && activeTab !== 'library' && !activePlaylist && (
           <div className="px-5 py-3.5 bg-black flex items-center justify-between z-10 select-none border-b border-gray-900/40">
@@ -657,7 +907,7 @@ export default function App() {
         )}
 
         {/* Active main view rendering layout */}
-        <div className="flex-1 overflow-hidden relative">
+        <div className="flex-1 overflow-hidden relative bg-[#030303] dynamic-bg">
           {activePlaylist ? (
             <PlaylistDetails
               playlist={activePlaylist}
@@ -696,6 +946,8 @@ export default function App() {
                   onPlaySong={handlePlaySong}
                   onAddToPlaylist={handleQuickAddSongToPlaylist}
                   hasActiveTrack={!!currentSong}
+                  currentPath={folderPath}
+                  onPathChange={setFolderPath}
                 />
               )}
               {activeTab === 'equalizer' && <EqualizerTab />}
@@ -705,6 +957,8 @@ export default function App() {
                   onTriggerScan={triggerStorageScan}
                   onTriggerImport={() => setShowUploader(true)}
                   onSettingsChange={setSettings}
+                  activeCategory={settingsCategory}
+                  onCategoryChange={setSettingsCategory}
                 />
               )}
             </>
@@ -743,7 +997,7 @@ export default function App() {
 
         {/* Sleek bottom Tab navigation bar */}
         {!isPlayerExpanded && (
-          <div className="absolute bottom-0 left-0 right-0 h-16 bg-black/75 flex justify-around select-none py-1 z-20">
+          <div className="absolute bottom-0 left-0 right-0 h-20 bg-black/90 flex justify-around select-none py-1.5 z-20 border-t border-zinc-900">
 
             {[
               { id: 'home', label: 'Home', icon: Home, activeIcon: Home },
@@ -762,17 +1016,17 @@ export default function App() {
                   }}
                   className="flex flex-col items-center justify-center flex-1 h-full font-semibold relative"
                 >
-                  <div className={`w-12 h-7 flex items-center justify-center transition-all duration-300 ${
-                    isActive ? 'text-white scale-105' : 'text-zinc-400 hover:text-zinc-200'
+                  <div className={`w-12 h-8 flex items-center justify-center transition-all duration-300 ${
+                    isActive ? 'text-white scale-110' : 'text-zinc-400 hover:text-zinc-200'
                   }`}>
                     <IconComponent 
-                      className={`w-4.5 h-4.5 transition-all duration-300 ${
+                      className={`w-6 h-6 transition-all duration-300 ${
                         isActive ? 'text-white' : 'text-zinc-400 hover:text-zinc-200'
                       }`} 
                       fill={isActive && tab.id !== 'settings' ? 'currentColor' : 'none'}
                     />
                   </div>
-                  <span className={`text-[9px] mt-0.5 transition-colors duration-200 ${
+                  <span className={`text-xs mt-0.5 transition-colors duration-200 ${
                     isActive ? 'text-white font-extrabold' : 'text-zinc-400 font-medium'
                   }`}>
                     {tab.label}

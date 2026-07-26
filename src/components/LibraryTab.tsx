@@ -264,16 +264,16 @@ export default function LibraryTab({
     <div className="h-full flex flex-col bg-[#030303] text-zinc-300 dynamic-bg dynamic-text overflow-hidden">
       
       {/* Search Header and Main Subtabs */}
-      <div className="px-5 pt-4 pb-2 border-b border-zinc-900 bg-black dynamic-header dynamic-border space-y-3 shrink-0">
+      <div className="px-5 pt-4 pb-2.5 border-b border-zinc-900 bg-black dynamic-header dynamic-border space-y-3 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="flex-1 bg-zinc-900/60 rounded-xl px-4 py-2 flex items-center gap-2.5 border border-zinc-800/60 focus-within:border-zinc-500 transition-all dynamic-item">
-            <Search className="w-4 h-4 text-zinc-500" />
+          <div className="flex-1 bg-zinc-900/60 rounded-xl px-4 py-2.5 flex items-center gap-2.5 border border-zinc-800 focus-within:border-zinc-500 transition-all dynamic-item">
+            <Search className="w-5 h-5 text-zinc-400 shrink-0" />
             <input
               type="text"
               placeholder={`Search ${activeTab}...`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-transparent text-xs text-white dynamic-text placeholder-zinc-600 focus:outline-none w-full"
+              className="bg-transparent text-sm font-medium text-white dynamic-text placeholder-zinc-500 focus:outline-none w-full"
             />
           </div>
           {activeTab === 'songs' && (
@@ -282,17 +282,17 @@ export default function LibraryTab({
               className={`p-2.5 rounded-xl border transition-all ${
                 isMultiSelectMode
                   ? 'bg-zinc-100 border-zinc-200 text-black font-semibold shadow-sm'
-                  : 'bg-zinc-900 border-zinc-800/60 text-zinc-400 hover:text-white'
+                  : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white'
               }`}
               title="Multi-select batch mode"
             >
-              <CheckSquare className="w-4.5 h-4.5" />
+              <CheckSquare className="w-5 h-5" />
             </button>
           )}
         </div>
 
         {/* Categories Tab selector */}
-        <div className="flex items-center gap-1 overflow-x-auto py-1 scrollbar-none select-none text-[11px] font-semibold">
+        <div className="flex items-center gap-1.5 overflow-x-auto py-1 scrollbar-none select-none text-xs font-bold">
           {[
             { id: 'songs', label: 'Songs' },
             { id: 'albums', label: 'Albums' },
@@ -306,10 +306,10 @@ export default function LibraryTab({
                 setActiveTab(tab.id as LibrarySubTab);
                 setIsMultiSelectMode(false);
               }}
-              className={`px-3.5 py-2 rounded-xl shrink-0 transition-all ${
+              className={`px-4 py-2.5 rounded-xl shrink-0 transition-all ${
                 activeTab === tab.id
-                  ? 'bg-zinc-100 text-black shadow-sm font-semibold'
-                  : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800/30'
+                  ? 'bg-zinc-100 text-black shadow-sm font-extrabold'
+                  : 'bg-zinc-900 text-zinc-300 hover:text-white border border-zinc-800/60'
               }`}
             >
               {tab.label}
@@ -320,12 +320,12 @@ export default function LibraryTab({
 
       {/* Sorting / Contextual Actions bar */}
       {activeTab === 'songs' && (
-        <div className="px-5 py-2.5 bg-zinc-950 border-b border-zinc-900 flex items-center justify-between text-[10.5px] select-none text-zinc-500 font-semibold">
+        <div className="px-5 py-2.5 bg-zinc-950 border-b border-zinc-900 flex items-center justify-between text-xs select-none text-zinc-400 font-medium">
           {isMultiSelectMode ? (
             <div className="flex items-center justify-between w-full">
               <button 
                 onClick={() => handleSelectAllFilteredSongs(filteredSongs)} 
-                className="hover:text-white transition-colors"
+                className="hover:text-white transition-colors font-semibold"
               >
                 Selected ({selectedSongIds.size})
               </button>
@@ -333,14 +333,14 @@ export default function LibraryTab({
                 <button
                   onClick={handleBulkPlay}
                   disabled={selectedSongIds.size === 0}
-                  className="px-2.5 py-1 bg-white hover:bg-zinc-200 disabled:opacity-30 disabled:pointer-events-none text-black font-bold rounded-lg flex items-center gap-1 transition-all"
+                  className="px-3 py-1.5 bg-white hover:bg-zinc-200 disabled:opacity-30 disabled:pointer-events-none text-black font-bold rounded-lg flex items-center gap-1.5 transition-all text-xs"
                 >
-                  <Play className="w-3 h-3 fill-black text-black" /> Play
+                  <Play className="w-3.5 h-3.5 fill-black text-black" /> Play
                 </button>
                 <button
                   onClick={handleBulkAddToQueue}
                   disabled={selectedSongIds.size === 0}
-                  className="px-2.5 py-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 disabled:opacity-30 disabled:pointer-events-none text-zinc-200 rounded-lg"
+                  className="px-3 py-1.5 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 disabled:opacity-30 disabled:pointer-events-none text-zinc-200 font-semibold rounded-lg text-xs"
                 >
                   + Queue
                 </button>
@@ -350,27 +350,27 @@ export default function LibraryTab({
                   <button
                     onClick={() => setShowBulkPlaylistDropdown(!showBulkPlaylistDropdown)}
                     disabled={selectedSongIds.size === 0}
-                    className="px-2.5 py-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 disabled:opacity-30 disabled:pointer-events-none text-zinc-200 rounded-lg"
+                    className="px-3 py-1.5 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 disabled:opacity-30 disabled:pointer-events-none text-zinc-200 font-semibold rounded-lg text-xs"
                   >
                     + Playlist
                   </button>
                   {showBulkPlaylistDropdown && (
-                    <div className={`absolute right-0 mt-2 w-44 rounded-xl p-1.5 z-50 shadow-2xl animate-fade-in text-[10.5px] border ${
+                    <div className={`absolute right-0 mt-2 w-48 rounded-xl p-2 z-50 shadow-2xl animate-fade-in text-xs border ${
                       isLight 
                         ? 'bg-white border-zinc-200 text-zinc-800' 
-                        : 'bg-zinc-900 border-zinc-800/80 text-zinc-200'
+                        : 'bg-zinc-900 border-zinc-800 text-zinc-200'
                     }`}>
-                      <span className={`block px-2 py-1 font-bold uppercase text-[8px] border-b mb-1.5 ${
-                        isLight ? 'text-zinc-500 border-zinc-100' : 'text-zinc-500 border-zinc-800/60'
+                      <span className={`block px-2 py-1 font-bold uppercase text-[9px] border-b mb-1.5 ${
+                        isLight ? 'text-zinc-500 border-zinc-100' : 'text-zinc-500 border-zinc-800'
                       }`}>Select custom playlist</span>
                       {playlists.filter(p => !p.isSmart).map(pl => (
                         <button
                           key={pl.id}
                           onClick={() => handleBulkAddToPlaylist(pl.id)}
-                          className={`w-full text-left px-2.5 py-1.5 rounded-lg transition-colors truncate block ${
+                          className={`w-full text-left px-2.5 py-2 rounded-lg transition-colors truncate block font-medium ${
                             isLight 
-                              ? 'hover:bg-zinc-100 text-zinc-700' 
-                              : 'hover:bg-zinc-800 text-zinc-300'
+                              ? 'hover:bg-zinc-100 text-zinc-800' 
+                              : 'hover:bg-zinc-800 text-zinc-200'
                           }`}
                         >
                           {pl.name}
@@ -383,18 +383,18 @@ export default function LibraryTab({
                 <button
                   onClick={handleBulkDelete}
                   disabled={selectedSongIds.size === 0}
-                  className="p-1 text-zinc-400 hover:text-white disabled:opacity-20 transition-all"
+                  className="p-1.5 text-zinc-400 hover:text-white disabled:opacity-20 transition-all"
                   title="Bulk Delete"
                 >
-                  <Trash className="w-4 h-4" />
+                  <Trash className="w-5 h-5" />
                 </button>
               </div>
             </div>
           ) : (
             <>
-              <div className="flex items-center gap-1.5 text-zinc-400">
-                <ArrowUpDown className="w-3.5 h-3.5 text-zinc-400" />
-                <span>Sort:</span>
+              <div className="flex items-center gap-2 text-zinc-300">
+                <ArrowUpDown className="w-4 h-4 text-zinc-400" />
+                <span className="font-medium">Sort:</span>
                 <button onClick={() => triggerSort('title')} className={`hover:text-white transition-colors ${sortField === 'title' ? 'text-white font-bold' : ''}`}>Title</button>
                 <span>•</span>
                 <button onClick={() => triggerSort('artist')} className={`hover:text-white transition-colors ${sortField === 'artist' ? 'text-white font-bold' : ''}`}>Artist</button>
@@ -403,7 +403,7 @@ export default function LibraryTab({
                 <span>•</span>
                 <button onClick={() => triggerSort('duration')} className={`hover:text-white transition-colors ${sortField === 'duration' ? 'text-white font-bold' : ''}`}>Duration</button>
               </div>
-              <span className="font-mono text-[9.5px] uppercase text-zinc-600">{filteredSongs.length} items</span>
+              <span className="font-mono text-xs uppercase text-zinc-500 font-semibold">{filteredSongs.length} items</span>
             </>
           )}
         </div>
@@ -421,7 +421,7 @@ export default function LibraryTab({
                 <div
                   key={song.id}
                   onClick={() => isMultiSelectMode ? null : onPlaySong(song, filteredSongs)}
-                  className={`flex items-center justify-between p-2.5 rounded-xl border transition-all ${
+                  className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
                     isMultiSelectMode 
                       ? isSelected 
                         ? (isLight ? 'bg-zinc-100 border-zinc-300' : 'bg-zinc-900 border-zinc-700') 
@@ -429,17 +429,17 @@ export default function LibraryTab({
                       : (isLight ? 'bg-white hover:bg-zinc-50 border-zinc-200' : 'bg-zinc-950/40 border-zinc-900/10 hover:bg-zinc-900/60')
                   } ${isLight ? '' : 'cursor-pointer'} group`}
                 >
-                  <div className="flex items-center gap-3 overflow-hidden mr-4 flex-1">
+                  <div className="flex items-center gap-3.5 overflow-hidden mr-4 flex-1">
                     {/* Checkbox for multiselect */}
                     {isMultiSelectMode ? (
                       <button 
                         onClick={(e) => handleToggleSelectSong(song.id, e)} 
                         className={`p-1 rounded-lg ${isLight ? 'text-zinc-400 hover:text-zinc-800' : 'text-zinc-500 hover:text-white'} transition-all shrink-0`}
                       >
-                        {isSelected ? <CheckSquare className={`w-5 h-5 ${isLight ? 'text-zinc-900' : 'text-white'}`} /> : <Square className="w-5 h-5" />}
+                        {isSelected ? <CheckSquare className={`w-6 h-6 ${isLight ? 'text-zinc-900' : 'text-white'}`} /> : <Square className="w-6 h-6" />}
                       </button>
                     ) : (
-                      <div className="w-9 h-9 rounded-sm shrink-0 relative overflow-hidden">
+                      <div className="w-12 h-12 rounded-md shrink-0 relative overflow-hidden shadow-sm">
                         <SongCover song={song} className="absolute inset-0 w-full h-full" size="sm" />
                         {song.isFavorite && (
                           <div className={`absolute top-0 left-0 ${isLight ? 'bg-zinc-900' : 'bg-white'} w-2.5 h-2.5 rounded-br-lg z-10`} />
@@ -447,19 +447,19 @@ export default function LibraryTab({
                       </div>
                     )}
                     <div className="truncate">
-                      <h4 className={`font-semibold text-xs ${isLight ? 'text-zinc-900 group-hover:text-zinc-800' : 'text-zinc-200 group-hover:text-white'} transition-colors truncate`}>{song.title}</h4>
-                      <p className={`text-[9.5px] ${isLight ? 'text-zinc-650' : 'text-zinc-400'} truncate mt-0.5`}>
-                        {song.artist}{song.album && song.album !== 'Local Downloads' ? ` • ${song.album}` : ''} • <span className="font-mono text-[9px]">{Math.floor(song.duration / 60)}:{(song.duration % 60).toString().padStart(2, '0')}</span>
+                      <h4 className={`font-bold text-sm ${isLight ? 'text-zinc-900 group-hover:text-zinc-800' : 'text-zinc-100 group-hover:text-white'} transition-colors truncate`}>{song.title}</h4>
+                      <p className={`text-xs ${isLight ? 'text-zinc-650' : 'text-zinc-400'} truncate mt-0.5 font-medium`}>
+                        {song.artist}{song.album && song.album !== 'Local Downloads' ? ` • ${song.album}` : ''} • <span className="font-mono text-xs opacity-80">{Math.floor(song.duration / 60)}:{(song.duration % 60).toString().padStart(2, '0')}</span>
                       </p>
                     </div>
                   </div>
 
                   {/* Context menu triggers / Fav heart */}
                   {!isMultiSelectMode && (
-                    <div className="flex items-center gap-1.5 shrink-0 relative" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center gap-2 shrink-0 relative" onClick={(e) => e.stopPropagation()}>
                       <button
                         onClick={(e) => handleSingleSongFavoriteToggle(song, e)}
-                        className={`p-1.5 rounded-full ${isLight ? 'hover:bg-zinc-100' : 'hover:bg-zinc-800/40'} transition-colors`}
+                        className={`p-2 rounded-full ${isLight ? 'hover:bg-zinc-100' : 'hover:bg-zinc-800/40'} transition-colors`}
                       >
                         <HeartIcon filled={song.isFavorite} isLight={isLight} />
                       </button>
@@ -469,69 +469,69 @@ export default function LibraryTab({
                           e.stopPropagation();
                           setActiveActionMenuId(activeActionMenuId === song.id ? null : song.id);
                         }}
-                        className={`p-1.5 rounded-full ${isLight ? 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100' : 'text-zinc-500 hover:text-white hover:bg-zinc-800/40'} transition-colors`}
+                        className={`p-2 rounded-full ${isLight ? 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/40'} transition-colors`}
                       >
-                        <MoreVertical className="w-4 h-4" />
+                        <MoreVertical className="w-5 h-5" />
                       </button>
 
                       {/* Floating context popover for a single song */}
                       {activeActionMenuId === song.id && (
-                        <div className={`absolute right-0 top-9 w-44 rounded-xl p-1.5 z-40 shadow-2xl animate-fade-in text-[11px] font-semibold space-y-0.5 border ${
+                        <div className={`absolute right-0 top-10 w-48 rounded-xl p-2 z-40 shadow-2xl animate-fade-in text-xs font-semibold space-y-1 border ${
                           isLight 
                             ? 'bg-white border-zinc-200 text-zinc-800' 
-                            : 'bg-zinc-900 border-zinc-800/80 text-zinc-200'
+                            : 'bg-zinc-900 border-zinc-800 text-zinc-200'
                         }`}>
                           <button
                             onClick={() => {
                               audioEngine.addToQueue(song);
                               setActiveActionMenuId(null);
                             }}
-                            className={`w-full text-left px-3 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                            className={`w-full text-left px-3 py-2.5 rounded-lg transition-colors flex items-center gap-2.5 ${
                               isLight 
-                                ? 'hover:bg-zinc-100 text-zinc-700' 
-                                : 'hover:bg-zinc-800 text-zinc-300'
+                                ? 'hover:bg-zinc-100 text-zinc-800' 
+                                : 'hover:bg-zinc-800 text-zinc-200'
                             }`}
                           >
-                            <ListPlus className="w-4 h-4" /> Add to Queue
+                            <ListPlus className="w-4.5 h-4.5" /> Add to Queue
                           </button>
                           <button
                             onClick={() => {
                               audioEngine.playNext(song);
                               setActiveActionMenuId(null);
                             }}
-                            className={`w-full text-left px-3 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                            className={`w-full text-left px-3 py-2.5 rounded-lg transition-colors flex items-center gap-2.5 ${
                               isLight 
-                                ? 'hover:bg-zinc-100 text-zinc-700' 
-                                : 'hover:bg-zinc-800 text-zinc-300'
+                                ? 'hover:bg-zinc-100 text-zinc-800' 
+                                : 'hover:bg-zinc-800 text-zinc-200'
                             }`}
                           >
-                            <PlaySquare className="w-4 h-4" /> Play Next
+                            <PlaySquare className="w-4.5 h-4.5" /> Play Next
                           </button>
                           <button
                             onClick={() => {
                               setAddToPlaylistSong(song);
                               setActiveActionMenuId(null);
                             }}
-                            className={`w-full text-left px-3 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                            className={`w-full text-left px-3 py-2.5 rounded-lg transition-colors flex items-center gap-2.5 ${
                               isLight 
-                                ? 'hover:bg-zinc-100 text-zinc-700' 
-                                : 'hover:bg-zinc-800 text-zinc-300'
+                                ? 'hover:bg-zinc-100 text-zinc-800' 
+                                : 'hover:bg-zinc-800 text-zinc-200'
                             }`}
                           >
-                            <ListMusic className="w-4 h-4" /> Add to Playlist
+                            <ListMusic className="w-4.5 h-4.5" /> Add to Playlist
                           </button>
                           <button
                             onClick={() => {
                               onEditMetadata(song);
                               setActiveActionMenuId(null);
                             }}
-                            className={`w-full text-left px-3 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                            className={`w-full text-left px-3 py-2.5 rounded-lg transition-colors flex items-center gap-2.5 ${
                               isLight 
-                                ? 'hover:bg-zinc-100 text-zinc-700' 
-                                : 'hover:bg-zinc-800 text-zinc-300'
+                                ? 'hover:bg-zinc-100 text-zinc-800' 
+                                : 'hover:bg-zinc-800 text-zinc-200'
                             }`}
                           >
-                            <Plus className="w-4 h-4" /> Edit Metadata Tags
+                            <Plus className="w-4.5 h-4.5" /> Edit Metadata Tags
                           </button>
                           <button
                             onClick={() => {
@@ -547,13 +547,13 @@ export default function LibraryTab({
                               });
                               setActiveActionMenuId(null);
                             }}
-                            className={`w-full text-left px-3 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                            className={`w-full text-left px-3 py-2.5 rounded-lg transition-colors flex items-center gap-2.5 ${
                               isLight 
                                 ? 'hover:bg-red-50 text-red-600' 
                                 : 'hover:bg-red-950/30 text-red-400'
                             }`}
                           >
-                            <Trash className="w-4 h-4" /> Delete Song File
+                            <Trash className="w-4.5 h-4.5" /> Delete Song File
                           </button>
                         </div>
                       )}
@@ -567,7 +567,7 @@ export default function LibraryTab({
 
         {/* TAB: ALBUMS */}
         {activeTab === 'albums' && (
-          <div className="grid grid-cols-2 gap-3.5 pt-1.5">
+          <div className="grid grid-cols-2 gap-4 pt-2">
             {albumsList.map((alb) => (
               <div
                 key={alb.name}
@@ -582,16 +582,16 @@ export default function LibraryTab({
                     dateCreated: Date.now(),
                   });
                 }}
-                className={`border ${isLight ? 'bg-white border-zinc-200 hover:border-zinc-300' : 'bg-zinc-900/40 border-zinc-800/50 hover:border-zinc-700'} rounded-xl p-3 text-center cursor-pointer group transition-all animate-fade-in`}
+                className={`border ${isLight ? 'bg-white border-zinc-200 hover:border-zinc-300' : 'bg-zinc-900/40 border-zinc-800/50 hover:border-zinc-700'} rounded-xl p-3.5 text-center cursor-pointer group transition-all animate-fade-in shadow-sm`}
               >
                 <SongCover 
                   song={alb.songs[0] || null} 
-                  className="w-full aspect-square rounded-sm mb-3" 
+                  className="w-full aspect-square rounded-lg mb-3 shadow-sm" 
                   size="md" 
                 />
-                <h4 className={`font-semibold text-xs ${isLight ? 'text-zinc-900 group-hover:text-zinc-800' : 'text-zinc-200 group-hover:text-white'} transition-colors truncate`}>{alb.name}</h4>
-                <p className={`text-[9px] ${isLight ? 'text-zinc-600' : 'text-zinc-400'} truncate mt-0.5`}>{alb.songs[0]?.artist || 'Various Artists'}</p>
-                <span className={`inline-block mt-2 px-2.5 py-0.5 ${isLight ? 'bg-zinc-100 text-zinc-600 border-zinc-200' : 'bg-zinc-950 text-zinc-500 border-zinc-900'} text-[8px] font-mono rounded-full border`}>{alb.songs.length} tracks</span>
+                <h4 className={`font-bold text-sm ${isLight ? 'text-zinc-900 group-hover:text-zinc-800' : 'text-zinc-100 group-hover:text-white'} transition-colors truncate`}>{alb.name}</h4>
+                <p className={`text-xs ${isLight ? 'text-zinc-600' : 'text-zinc-400'} truncate mt-1 font-medium`}>{alb.songs[0]?.artist || 'Various Artists'}</p>
+                <span className={`inline-block mt-2 px-3 py-1 ${isLight ? 'bg-zinc-100 text-zinc-700 border-zinc-200' : 'bg-zinc-950 text-zinc-400 border-zinc-800'} text-xs font-mono rounded-full border font-semibold`}>{alb.songs.length} tracks</span>
               </div>
             ))}
           </div>
@@ -599,7 +599,7 @@ export default function LibraryTab({
 
         {/* TAB: ARTISTS */}
         {activeTab === 'artists' && (
-          <div className="space-y-1.5 pt-1">
+          <div className="space-y-2 pt-1">
             {artistsList.map((art) => (
               <div
                 key={art.name}
@@ -613,20 +613,20 @@ export default function LibraryTab({
                     dateCreated: Date.now(),
                   });
                 }}
-                className={`flex items-center justify-between p-3 ${isLight ? 'bg-white border-zinc-200 hover:bg-zinc-100/60 hover:border-zinc-300' : 'bg-zinc-950/40 hover:bg-zinc-900/50 border-zinc-900/40 hover:border-zinc-800'} border rounded-xl transition-all cursor-pointer group`}
+                className={`flex items-center justify-between p-3.5 ${isLight ? 'bg-white border-zinc-200 hover:bg-zinc-100/60 hover:border-zinc-300' : 'bg-zinc-950/40 hover:bg-zinc-900/50 border-zinc-900/40 hover:border-zinc-800'} border rounded-xl transition-all cursor-pointer group`}
               >
-                <div className="flex items-center gap-3.5">
+                <div className="flex items-center gap-4">
                   <SongCover 
                     song={art.songs[0] || null} 
-                    className={`w-10 h-10 rounded-sm border ${isLight ? 'border-zinc-200' : 'border-zinc-800/60'}`} 
+                    className={`w-12 h-12 rounded-lg border ${isLight ? 'border-zinc-200' : 'border-zinc-800'}`} 
                     size="sm" 
                   />
                   <div>
-                    <h4 className={`font-semibold text-xs ${isLight ? 'text-zinc-900 group-hover:text-zinc-800' : 'text-zinc-200 group-hover:text-white'} transition-colors`}>{art.name}</h4>
-                    <p className={`text-[9.5px] ${isLight ? 'text-zinc-600' : 'text-zinc-400'} font-mono`}>{art.songs.length} {art.songs.length === 1 ? 'track' : 'tracks'} indexed</p>
+                    <h4 className={`font-bold text-sm ${isLight ? 'text-zinc-900 group-hover:text-zinc-800' : 'text-zinc-100 group-hover:text-white'} transition-colors`}>{art.name}</h4>
+                    <p className={`text-xs ${isLight ? 'text-zinc-600' : 'text-zinc-400'} font-medium mt-0.5`}>{art.songs.length} {art.songs.length === 1 ? 'track' : 'tracks'} indexed</p>
                   </div>
                 </div>
-                <ChevronRight className={`w-4 h-4 ${isLight ? 'text-zinc-400 group-hover:text-zinc-700' : 'text-zinc-400 group-hover:text-zinc-200'} transition-colors`} />
+                <ChevronRight className={`w-5 h-5 ${isLight ? 'text-zinc-400 group-hover:text-zinc-700' : 'text-zinc-400 group-hover:text-zinc-200'} transition-colors`} />
               </div>
             ))}
           </div>
@@ -634,7 +634,7 @@ export default function LibraryTab({
 
         {/* TAB: GENRES */}
         {activeTab === 'genres' && (
-          <div className="space-y-1.5 pt-1">
+          <div className="space-y-2 pt-1">
             {genresList.map((gen) => (
               <div
                 key={gen.name}
@@ -648,18 +648,18 @@ export default function LibraryTab({
                     dateCreated: Date.now(),
                   });
                 }}
-                className={`flex items-center justify-between p-3 ${isLight ? 'bg-white border-zinc-200 hover:bg-zinc-100/60 hover:border-zinc-300' : 'bg-zinc-950/40 hover:bg-zinc-900/50 border-zinc-900/40 hover:border-zinc-800'} border rounded-xl transition-all cursor-pointer group`}
+                className={`flex items-center justify-between p-3.5 ${isLight ? 'bg-white border-zinc-200 hover:bg-zinc-100/60 hover:border-zinc-300' : 'bg-zinc-950/40 hover:bg-zinc-900/50 border-zinc-900/40 hover:border-zinc-800'} border rounded-xl transition-all cursor-pointer group`}
               >
-                <div className="flex items-center gap-3">
-                  <div className={`p-2.5 ${isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-600' : 'bg-zinc-900 border-zinc-800/60 text-zinc-400'} border rounded-xl`}>
-                    <Music className="w-4.5 h-4.5" />
+                <div className="flex items-center gap-3.5">
+                  <div className={`p-3 ${isLight ? 'bg-zinc-100 border-zinc-200 text-zinc-700' : 'bg-zinc-900 border-zinc-800 text-zinc-300'} border rounded-xl`}>
+                    <Music className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className={`font-semibold text-xs ${isLight ? 'text-zinc-900 group-hover:text-zinc-800' : 'text-zinc-200 group-hover:text-white'} transition-colors`}>{gen.name}</h4>
-                    <p className={`text-[9px] ${isLight ? 'text-zinc-600' : 'text-zinc-400'} font-mono`}>{gen.songs.length} audio tracks</p>
+                    <h4 className={`font-bold text-sm ${isLight ? 'text-zinc-900 group-hover:text-zinc-800' : 'text-zinc-100 group-hover:text-white'} transition-colors`}>{gen.name}</h4>
+                    <p className={`text-xs ${isLight ? 'text-zinc-600' : 'text-zinc-400'} font-medium mt-0.5`}>{gen.songs.length} audio tracks</p>
                   </div>
                 </div>
-                <ChevronRight className={`w-4 h-4 ${isLight ? 'text-zinc-400 group-hover:text-zinc-700' : 'text-zinc-500 group-hover:text-zinc-300'}`} />
+                <ChevronRight className={`w-5 h-5 ${isLight ? 'text-zinc-400 group-hover:text-zinc-700' : 'text-zinc-500 group-hover:text-zinc-300'}`} />
               </div>
             ))}
           </div>
@@ -671,22 +671,22 @@ export default function LibraryTab({
             {/* Create playlist banner button */}
             <button
               onClick={() => setShowCreatePlaylist(!showCreatePlaylist)}
-              className={`w-full py-2.5 ${isLight ? 'bg-zinc-100 hover:bg-zinc-200 text-zinc-900 border-zinc-300' : 'bg-zinc-900 hover:bg-zinc-850 border border-zinc-800/60 text-zinc-200'} border text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-sm`}
+              className={`w-full py-3 ${isLight ? 'bg-zinc-100 hover:bg-zinc-200 text-zinc-900 border-zinc-300' : 'bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-zinc-100'} border text-sm font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-sm`}
             >
-              <Plus className="w-4 h-4" /> Create Custom Playlist
+              <Plus className="w-5 h-5" /> Create Custom Playlist
             </button>
 
             {/* Custom Playlist Creator form */}
             {showCreatePlaylist && (
-              <form onSubmit={handleCreatePlaylist} className={`p-4 ${isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-850 text-zinc-200'} border rounded-xl space-y-3.5 text-xs animate-fade-in shadow-xl`}>
-                <h4 className={`font-semibold ${isLight ? 'text-zinc-900' : 'text-zinc-200'}`}>New Playlist Config</h4>
+              <form onSubmit={handleCreatePlaylist} className={`p-4 ${isLight ? 'bg-white border-zinc-300 text-zinc-900' : 'bg-zinc-950 border-zinc-800 text-zinc-100'} border rounded-xl space-y-3.5 text-xs animate-fade-in shadow-xl`}>
+                <h4 className={`font-bold text-sm ${isLight ? 'text-zinc-900' : 'text-zinc-100'}`}>New Playlist Config</h4>
                 <div className="space-y-2">
                   <input
                     type="text"
                     placeholder="Playlist Name"
                     value={newPlaylistName}
                     onChange={(e) => setNewPlaylistName(e.target.value)}
-                    className={`w-full ${isLight ? 'bg-zinc-100 text-zinc-900 border-zinc-300 focus:border-zinc-400 placeholder-zinc-500' : 'bg-zinc-900 text-white border-zinc-800/80 focus:border-zinc-500'} rounded-xl px-3 py-2 border focus:outline-none`}
+                    className={`w-full ${isLight ? 'bg-zinc-100 text-zinc-900 border-zinc-300 focus:border-zinc-400 placeholder-zinc-500' : 'bg-zinc-900 text-white border-zinc-800 focus:border-zinc-500'} rounded-xl px-3.5 py-2.5 border focus:outline-none text-sm font-medium`}
                     required
                   />
                   <input
@@ -694,20 +694,20 @@ export default function LibraryTab({
                     placeholder="Description (optional)"
                     value={newPlaylistDesc}
                     onChange={(e) => setNewPlaylistDesc(e.target.value)}
-                    className={`w-full ${isLight ? 'bg-zinc-100 text-zinc-900 border-zinc-300 focus:border-zinc-400 placeholder-zinc-500' : 'bg-zinc-900 text-white border-zinc-800/80 focus:border-zinc-500'} rounded-xl px-3 py-2 border focus:outline-none`}
+                    className={`w-full ${isLight ? 'bg-zinc-100 text-zinc-900 border-zinc-300 focus:border-zinc-400 placeholder-zinc-500' : 'bg-zinc-900 text-white border-zinc-800 focus:border-zinc-500'} rounded-xl px-3.5 py-2.5 border focus:outline-none text-sm font-medium`}
                   />
                 </div>
                 <div className="flex gap-2">
                   <button
                     type="button"
                     onClick={() => setShowCreatePlaylist(false)}
-                    className={`flex-1 py-2 ${isLight ? 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border-zinc-300' : 'bg-zinc-900 hover:bg-zinc-800 text-zinc-350 border-zinc-800'} rounded-lg border`}
+                    className={`flex-1 py-2.5 ${isLight ? 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border-zinc-300' : 'bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border-zinc-800'} rounded-lg border text-xs font-semibold`}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className={`flex-1 py-2 ${isLight ? 'bg-zinc-900 hover:bg-zinc-850 text-white font-semibold' : 'bg-white hover:bg-zinc-100 text-black font-semibold'} rounded-lg`}
+                    className={`flex-1 py-2.5 ${isLight ? 'bg-zinc-900 hover:bg-zinc-850 text-white font-bold' : 'bg-white hover:bg-zinc-100 text-black font-bold'} rounded-lg text-xs`}
                   >
                     Create
                   </button>
@@ -716,7 +716,7 @@ export default function LibraryTab({
             )}
 
             {/* Render playlist options */}
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               {playlists
                 .filter(p => p.smartType !== 'recently-played' && p.smartType !== 'recently-added')
                 .map((pl) => {
@@ -750,20 +750,20 @@ export default function LibraryTab({
                   <div
                     key={pl.id}
                     onClick={() => onSelectPlaylist(pl)}
-                    className={`flex items-center justify-between p-3 ${isLight ? 'bg-white border-zinc-200 hover:bg-zinc-100/60 hover:border-zinc-300' : 'bg-zinc-950/40 hover:bg-zinc-900/50 border-zinc-900/40 hover:border-zinc-800'} border rounded-xl transition-all cursor-pointer group`}
+                    className={`flex items-center justify-between p-3.5 ${isLight ? 'bg-white border-zinc-200 hover:bg-zinc-100/60 hover:border-zinc-300' : 'bg-zinc-950/40 hover:bg-zinc-900/50 border-zinc-900/40 hover:border-zinc-800'} border rounded-xl transition-all cursor-pointer group`}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full shrink-0 relative overflow-hidden border border-zinc-200/10 shadow-sm">
+                    <div className="flex items-center gap-3.5">
+                      <div className="w-12 h-12 rounded-full shrink-0 relative overflow-hidden border border-zinc-200/10 shadow-sm">
                         <SongCover song={coverSong} className="absolute inset-0 w-full h-full object-cover" size="sm" />
                       </div>
                       <div>
-                        <h4 className={`font-semibold text-xs ${isLight ? 'text-zinc-900 group-hover:text-zinc-800' : 'text-zinc-200 group-hover:text-white'} transition-colors`}>{pl.name}</h4>
-                        <p className={`text-[9px] ${isLight ? 'text-zinc-600' : 'text-zinc-400'} truncate max-w-[200px] mt-0.5`}>
+                        <h4 className={`font-bold text-sm ${isLight ? 'text-zinc-900 group-hover:text-zinc-800' : 'text-zinc-100 group-hover:text-white'} transition-colors`}>{pl.name}</h4>
+                        <p className={`text-xs ${isLight ? 'text-zinc-600' : 'text-zinc-400'} truncate max-w-[200px] mt-0.5 font-medium`}>
                           {pl.isSmart ? 'Smart Playlist' : pl.description || 'Playlist'} • {count} songs
                         </p>
                       </div>
                     </div>
-                    <ChevronRight className={`w-4 h-4 ${isLight ? 'text-zinc-400 group-hover:text-zinc-700' : 'text-zinc-500 group-hover:text-zinc-300'} transition-colors`} />
+                    <ChevronRight className={`w-5 h-5 ${isLight ? 'text-zinc-400 group-hover:text-zinc-700' : 'text-zinc-500 group-hover:text-zinc-300'} transition-colors`} />
                   </div>
                 );
               })}

@@ -148,11 +148,11 @@ export default function Dashboard({ songs, playlists = [], onPlaySong, onNavigat
     smartType?: 'favorites' | 'recently-played' | 'recently-added'
   ) => {
     return (
-      <div className="space-y-3">
+      <div className="space-y-4">
         <div className="flex items-center justify-between border-b border-transparent">
           <div className="flex items-center gap-2">
             {icon && <span className={isLight ? 'text-zinc-600' : 'text-zinc-400'}>{icon}</span>}
-            <h2 className={`font-display font-bold text-base ${isLight ? 'text-zinc-900' : 'text-zinc-100'} tracking-tight`}>{title}</h2>
+            <h2 className={`font-display font-bold text-lg sm:text-xl ${isLight ? 'text-zinc-900' : 'text-zinc-100'} tracking-tight`}>{title}</h2>
           </div>
           {smartType && smartType !== 'recently-played' && items.length > 0 && (
             <button
@@ -172,16 +172,16 @@ export default function Dashboard({ songs, playlists = [], onPlaySong, onNavigat
                   dateCreated: Date.now()
                 });
               }}
-              className={`text-[11px] ${isLight ? 'text-zinc-500 hover:text-zinc-900' : 'text-zinc-400 hover:text-white'} font-medium flex items-center gap-0.5 transition-colors`}
+              className={`text-xs ${isLight ? 'text-zinc-600 hover:text-zinc-900' : 'text-zinc-300 hover:text-white'} font-semibold flex items-center gap-1 transition-colors`}
             >
-              See All <ChevronRight className="w-3.5 h-3.5" />
+              See All <ChevronRight className="w-4 h-4" />
             </button>
           )}
         </div>
 
         {items.length === 0 ? (
           <div className={`py-6 px-4 ${isLight ? 'bg-zinc-100/60 border-zinc-200' : 'bg-zinc-900/20 border-zinc-800/40'} border rounded-xl text-center`}>
-            <p className="text-[10.5px] text-zinc-500 font-medium">{fallbackText}</p>
+            <p className="text-xs text-zinc-500 font-medium">{fallbackText}</p>
           </div>
         ) : smartType === 'recently-played' ? (
           <div className="grid grid-cols-3 gap-3">
@@ -191,18 +191,18 @@ export default function Dashboard({ songs, playlists = [], onPlaySong, onNavigat
                 onClick={() => onPlaySong(song, items)}
                 className="w-full text-left snap-start group select-none relative"
               >
-                <div className="aspect-square w-full rounded-sm relative overflow-hidden group-hover:scale-[0.97] transition-all duration-350">
+                <div className="aspect-square w-full rounded-md relative overflow-hidden group-hover:scale-[0.97] transition-all duration-350 shadow-sm">
                   <SongCover song={song} className="absolute inset-0 w-full h-full" size="md" />
                   {/* Overlay inside the rectangle at the bottom containing title & artist */}
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/55 to-transparent p-2 pt-4 flex flex-col justify-end z-10">
-                    <h4 className="font-semibold text-[10px] text-white transition-colors truncate w-full leading-tight">
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-2.5 pt-5 flex flex-col justify-end z-10">
+                    <h4 className="font-bold text-xs text-white transition-colors truncate w-full leading-tight">
                       {song.title}
                     </h4>
-                    <p className="text-[8.5px] text-zinc-300 truncate w-full mt-0.5 leading-tight">{song.artist}</p>
+                    <p className="text-[10.5px] text-zinc-300 truncate w-full mt-0.5 leading-tight font-medium">{song.artist}</p>
                   </div>
                   {/* Play overlay on hover */}
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/35 transition-all flex items-center justify-center z-20">
-                    <Play className="w-7 h-7 fill-zinc-100 text-zinc-100 opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100" />
+                    <Play className="w-8 h-8 fill-zinc-100 text-zinc-100 opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100" />
                   </div>
                 </div>
               </button>
@@ -214,18 +214,18 @@ export default function Dashboard({ songs, playlists = [], onPlaySong, onNavigat
               <button
                 key={song.id}
                 onClick={() => onPlaySong(song, items)}
-                className="w-28 shrink-0 text-left snap-start group select-none"
+                className="w-32 shrink-0 text-left snap-start group select-none"
               >
-                <div className="w-28 h-28 rounded-sm relative overflow-hidden group-hover:scale-[0.97] transition-all duration-350 mb-2">
+                <div className="w-32 h-32 rounded-md relative overflow-hidden group-hover:scale-[0.97] transition-all duration-350 mb-2 shadow-sm">
                   <SongCover song={song} className="absolute inset-0 w-full h-full" size="md" />
                   <div className="absolute inset-0 bg-black/10 group-hover:bg-black/40 transition-all flex items-center justify-center z-10">
-                    <Play className="w-8 h-8 fill-zinc-100 text-zinc-100 opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100" />
+                    <Play className="w-9 h-9 fill-zinc-100 text-zinc-100 opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100" />
                   </div>
                 </div>
-                <h4 className={`font-semibold text-[11px] ${isLight ? 'text-zinc-900 group-hover:text-zinc-800' : 'text-zinc-200 group-hover:text-white'} transition-colors truncate w-full`}>
+                <h4 className={`font-bold text-xs ${isLight ? 'text-zinc-900 group-hover:text-zinc-800' : 'text-zinc-100 group-hover:text-white'} transition-colors truncate w-full`}>
                   {song.title}
                 </h4>
-                <p className={`text-[9.5px] ${isLight ? 'text-zinc-600' : 'text-zinc-400'} truncate w-full mt-0.5`}>{song.artist}</p>
+                <p className={`text-[11px] ${isLight ? 'text-zinc-600' : 'text-zinc-400'} truncate w-full mt-0.5 font-medium`}>{song.artist}</p>
               </button>
             ))}
           </div>
@@ -259,16 +259,16 @@ export default function Dashboard({ songs, playlists = [], onPlaySong, onNavigat
 
       {/* Visual greeting brand bar */}
       <div className="flex items-center justify-between select-none relative z-10 gap-3">
-        <div className="flex items-center gap-2.5 shrink-0">
-          <div className="w-7 h-7 bg-emerald-500 rounded-full flex items-center justify-center shadow-md shadow-emerald-500/20">
-            <Play className="w-3.5 h-3.5 text-black fill-black ml-0.5" />
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="w-9 h-9 bg-emerald-500 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/25">
+            <Play className="w-4 h-4 text-black fill-black ml-0.5" />
           </div>
-          <span className={`text-xl font-bold tracking-tight ${isLight ? 'text-zinc-900' : 'text-white'} dynamic-text-title`}>Music</span>
+          <span className={`text-2xl font-extrabold tracking-tight ${isLight ? 'text-zinc-900' : 'text-white'} dynamic-text-title`}>Music</span>
         </div>
         
         {/* Search bar styled same as from Library page */}
-        <div className={`flex-1 max-w-[130px] sm:max-w-[170px] bg-transparent ${isLight ? 'border-zinc-300 focus-within:border-zinc-500' : 'border-zinc-800/80 focus-within:border-zinc-600'} rounded-xl px-3 py-1.5 flex items-center gap-2 border transition-all`}>
-          <Search className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+        <div className={`flex-1 max-w-[150px] sm:max-w-[200px] bg-transparent ${isLight ? 'border-zinc-300 focus-within:border-zinc-500' : 'border-zinc-800 focus-within:border-zinc-600'} rounded-xl px-3.5 py-2 flex items-center gap-2 border transition-all`}>
+          <Search className="w-4 h-4 text-zinc-400 shrink-0" />
           <input
             type="text"
             placeholder="Search..."
@@ -281,7 +281,7 @@ export default function Dashboard({ songs, playlists = [], onPlaySong, onNavigat
                 setIsSearching(false);
               }
             }}
-            className={`bg-transparent text-xs ${isLight ? 'text-zinc-900 placeholder-zinc-400' : 'text-white placeholder-zinc-600'} focus:outline-none w-full`}
+            className={`bg-transparent text-sm ${isLight ? 'text-zinc-900 placeholder-zinc-400' : 'text-white placeholder-zinc-500'} focus:outline-none w-full font-medium`}
           />
           {searchQuery && (
             <button
@@ -289,7 +289,7 @@ export default function Dashboard({ songs, playlists = [], onPlaySong, onNavigat
                 setSearchQuery('');
                 setIsSearching(false);
               }}
-              className={`p-0.5 ${isLight ? 'text-zinc-500 hover:text-zinc-900' : 'text-zinc-500 hover:text-white'} transition-colors`}
+              className={`p-0.5 ${isLight ? 'text-zinc-500 hover:text-zinc-900' : 'text-zinc-400 hover:text-white'} transition-colors`}
             >
               <X className="w-4 h-4" />
             </button>
@@ -362,20 +362,20 @@ export default function Dashboard({ songs, playlists = [], onPlaySong, onNavigat
               <div 
                 id="home-play-all-widget" 
                 onClick={() => onNavigateToTab('library')}
-                className="w-full rounded-xl p-4 flex items-center justify-between select-none cursor-pointer transition-all duration-500 hover:scale-[1.01]"
+                className="w-full rounded-2xl p-4.5 flex items-center justify-between select-none cursor-pointer transition-all duration-500 hover:scale-[1.01] shadow-md border border-white/5"
                 style={{
                   background: playAllColors
                     ? (isLight
-                      ? `linear-gradient(135deg, ${playAllColors.from.replace('hsl', 'hsla').replace(')', ', 0.16)')}, ${playAllColors.to.replace('hsl', 'hsla').replace(')', ', 0.26)')}), #f4f4f5`
-                      : `linear-gradient(135deg, ${playAllColors.from.replace('hsl', 'hsla').replace(')', ', 0.24)')}, ${playAllColors.to.replace('hsl', 'hsla').replace(')', ', 0.36)')}), #090a0e`)
+                      ? `linear-gradient(135deg, ${playAllColors.from.replace('hsl', 'hsla').replace(')', ', 0.18)')}, ${playAllColors.to.replace('hsl', 'hsla').replace(')', ', 0.30)')}), #f4f4f5`
+                      : `linear-gradient(135deg, ${playAllColors.from.replace('hsl', 'hsla').replace(')', ', 0.28)')}, ${playAllColors.to.replace('hsl', 'hsla').replace(')', ', 0.42)')}), #090a0e`)
                     : undefined
                 }}
               >
                 <div className="space-y-1 pr-4 min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <h3 className={`font-sans font-bold text-xs tracking-tight ${isLight ? 'text-zinc-900' : 'text-white'}`}>Play All</h3>
+                    <h3 className={`font-sans font-bold text-base tracking-tight ${isLight ? 'text-zinc-900' : 'text-white'}`}>Play All</h3>
                   </div>
-                  <p className={`text-[10px] font-medium truncate ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>
+                  <p className={`text-xs font-medium truncate ${isLight ? 'text-zinc-600' : 'text-zinc-300'}`}>
                     {currentSong 
                       ? `Now Playing: ${currentSong.title} • ${currentSong.artist}`
                       : (songs.length > 0 ? `Play all ${songs.length} indexed songs` : 'Import audio files to play')
@@ -394,7 +394,7 @@ export default function Dashboard({ songs, playlists = [], onPlaySong, onNavigat
                     }
                   }}
                   disabled={songs.length === 0}
-                  className={`w-9 h-9 rounded-full flex items-center justify-center transition-all shrink-0 active:scale-95 shadow-md hover:scale-105 ${
+                  className={`w-11 h-11 rounded-full flex items-center justify-center transition-all shrink-0 active:scale-95 shadow-lg hover:scale-105 ${
                     isLight 
                       ? 'bg-zinc-900 hover:bg-zinc-800 text-white' 
                       : 'bg-white hover:bg-zinc-100 text-zinc-900'
@@ -405,7 +405,7 @@ export default function Dashboard({ songs, playlists = [], onPlaySong, onNavigat
                   }}
                   title="Play all tracks"
                 >
-                  <Play className={`w-3.5 h-3.5 fill-current ml-0.5 ${isLight ? 'text-white' : 'text-zinc-900'}`} />
+                  <Play className={`w-5 h-5 fill-current ml-0.5 ${isLight ? 'text-white' : 'text-zinc-900'}`} />
                 </button>
               </div>
             );
@@ -451,20 +451,20 @@ export default function Dashboard({ songs, playlists = [], onPlaySong, onNavigat
                       <div
                         key={pl.id}
                         onClick={() => onSelectPlaylist(pl)}
-                        className="flex items-center justify-between pl-0 py-0 pr-2.5 h-11 rounded-[2px] border transition-all cursor-pointer shadow-sm group overflow-hidden bg-[#D3D3D3] hover:bg-[#c2c2c2] border-[#c2c2c2] hover:border-[#b2b2b2]"
+                        className="flex items-center justify-between pl-0 py-0 pr-3 h-14 rounded-md border transition-all cursor-pointer shadow-sm group overflow-hidden bg-[#D3D3D3] hover:bg-[#c2c2c2] border-[#c2c2c2] hover:border-[#b2b2b2]"
                       >
-                        <div className="flex items-center gap-2.5 overflow-hidden mr-4 flex-1 h-full pl-2">
-                          <div className="w-8 h-8 shrink-0 flex-shrink-0 relative overflow-hidden flex items-center justify-center rounded-full bg-[#072024]/10">
+                        <div className="flex items-center gap-3 overflow-hidden mr-3 flex-1 h-full pl-2.5">
+                          <div className="w-10 h-10 shrink-0 flex-shrink-0 relative overflow-hidden flex items-center justify-center rounded-full bg-[#072024]/10 shadow-inner">
                             {firstSong ? (
                               <SongCover song={firstSong} className="absolute inset-0 w-full h-full !border-0 !border-none !rounded-full object-cover" size="sm" />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center bg-[#072024]/5 rounded-full">
-                                <Music className="w-3.5 h-3.5 text-[#082124]/40" />
+                                <Music className="w-4 h-4 text-[#082124]/50" />
                               </div>
                             )}
                           </div>
                           <div className="truncate py-1">
-                            <h4 className="font-bold text-xs transition-colors truncate text-[#082124] group-hover:text-black">
+                            <h4 className="font-extrabold text-sm transition-colors truncate text-[#082124] group-hover:text-black">
                               {pl.name}
                             </h4>
                           </div>
@@ -480,58 +480,58 @@ export default function Dashboard({ songs, playlists = [], onPlaySong, onNavigat
           <div className="space-y-3">
             <div className="flex items-center justify-between border-b border-transparent">
               <div className="flex items-center gap-2">
-                <h2 className={`font-display font-bold text-base ${isLight ? 'text-zinc-900' : 'text-zinc-100'} tracking-tight`}>Quick picks</h2>
+                <h2 className={`font-display font-bold text-lg sm:text-xl ${isLight ? 'text-zinc-900' : 'text-zinc-100'} tracking-tight`}>Quick picks</h2>
               </div>
               {quickPicks.length > 0 && (
                 <button
                   onClick={() => {
                     audioEngine.setQueue(quickPicks, 0, true);
                   }}
-                  className={`text-[11px] ${isLight ? 'text-zinc-500 hover:text-zinc-900' : 'text-zinc-400 hover:text-white'} font-medium flex items-center gap-1 transition-colors`}
+                  className={`text-xs ${isLight ? 'text-zinc-600 hover:text-zinc-900' : 'text-zinc-300 hover:text-white'} font-semibold flex items-center gap-1.5 transition-colors`}
                 >
-                  <Shuffle className="w-3.5 h-3.5" /> Play Shuffle
+                  <Shuffle className="w-4 h-4" /> Play Shuffle
                 </button>
               )}
             </div>
 
             {quickPicks.length === 0 ? (
               <div className={`py-6 px-4 ${isLight ? 'bg-zinc-100/60 border-zinc-200' : 'bg-zinc-900/20 border-zinc-800/40'} border rounded-xl text-center`}>
-                <p className="text-[10.5px] text-zinc-500 font-medium">Import audio files to generate quick picks.</p>
+                <p className="text-xs text-zinc-500 font-medium">Import audio files to generate quick picks.</p>
               </div>
             ) : (
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 {quickPicks.map((song) => (
                   <div
                     key={song.id}
                     onClick={() => onPlaySong(song, quickPicks)}
-                    className={`flex items-center justify-between pl-0 py-0 pr-2.5 rounded-[2px] transition-all cursor-pointer shadow-sm group overflow-hidden ${
+                    className={`flex items-center justify-between pl-0 py-0 pr-3 rounded-md transition-all cursor-pointer shadow-sm group overflow-hidden ${
                       isLight 
-                        ? 'bg-white hover:bg-zinc-50/80 border-b border-zinc-100/80' 
-                        : 'bg-zinc-950/40 hover:bg-zinc-900/60'
+                        ? 'bg-white hover:bg-zinc-50/80 border-b border-zinc-200/80' 
+                        : 'bg-zinc-950/60 hover:bg-zinc-900/80'
                     }`}
                   >
-                    <div className="flex items-center gap-3 overflow-hidden mr-4 flex-1 h-11">
-                      <div className={`w-11 h-11 shrink-0 relative overflow-hidden ${isLight ? 'bg-zinc-100' : 'bg-zinc-900'} flex items-center justify-center rounded-l-[2px]`}>
+                    <div className="flex items-center gap-3.5 overflow-hidden mr-4 flex-1 h-14">
+                      <div className={`w-14 h-14 shrink-0 relative overflow-hidden ${isLight ? 'bg-zinc-100' : 'bg-zinc-900'} flex items-center justify-center rounded-l-md`}>
                         <SongCover song={song} className="absolute inset-0 w-full h-full !border-0 !rounded-none" size="sm" />
                         {song.isFavorite && (
-                          <div className={`absolute top-0 left-0 ${isLight ? 'bg-zinc-900' : 'bg-white'} w-2 h-2 rounded-br z-10`} />
+                          <div className={`absolute top-0 left-0 ${isLight ? 'bg-zinc-900' : 'bg-white'} w-2.5 h-2.5 rounded-br z-10`} />
                         )}
                       </div>
                       <div className="truncate py-1">
-                        <h4 className={`font-semibold text-xs ${isLight ? 'text-zinc-900 group-hover:text-zinc-800' : 'text-zinc-200 group-hover:text-white'} transition-colors truncate`}>{song.title}</h4>
-                        <p className={`text-[9.5px] ${isLight ? 'text-zinc-500' : 'text-zinc-400'} truncate mt-0.5`}>
-                          {song.artist}{song.album && song.album !== 'Local Downloads' ? ` • ${song.album}` : ''} • <span className="font-mono text-[9px]">{Math.floor(song.duration / 60)}:{(song.duration % 60).toString().padStart(2, '0')}</span>
+                        <h4 className={`font-bold text-sm ${isLight ? 'text-zinc-900 group-hover:text-zinc-800' : 'text-zinc-100 group-hover:text-white'} transition-colors truncate`}>{song.title}</h4>
+                        <p className={`text-xs ${isLight ? 'text-zinc-600' : 'text-zinc-400'} truncate mt-0.5 font-medium`}>
+                          {song.artist}{song.album && song.album !== 'Local Downloads' ? ` • ${song.album}` : ''} • <span className="font-mono text-xs opacity-80">{Math.floor(song.duration / 60)}:{(song.duration % 60).toString().padStart(2, '0')}</span>
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
                       <button
                         onClick={() => onPlaySong(song, quickPicks)}
-                        className={`p-2 rounded-full ${isLight ? 'hover:bg-zinc-100 text-zinc-700 hover:text-zinc-900' : 'hover:bg-zinc-800/40 text-zinc-400 hover:text-white'} transition-colors`}
+                        className={`p-2.5 rounded-full ${isLight ? 'hover:bg-zinc-100 text-zinc-700 hover:text-zinc-900' : 'hover:bg-zinc-800/60 text-zinc-300 hover:text-white'} transition-colors`}
                         title="Play Song"
                       >
-                        <Play className="w-3.5 h-3.5 fill-current text-current" />
+                        <Play className="w-4.5 h-4.5 fill-current text-current" />
                       </button>
                     </div>
                   </div>

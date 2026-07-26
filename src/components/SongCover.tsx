@@ -133,7 +133,7 @@ export default function SongCover({
     <div
       className={`relative overflow-hidden flex flex-col items-center justify-center text-white/90 font-extrabold select-none border border-zinc-800/30 ${className}`}
       style={{
-        background: '#101012'
+        background: coverUrl ? '#101012' : `linear-gradient(135deg, ${colors.from}, ${colors.to})`
       }}
     >
       {/* Decorative vinyl/waveform lines for a premium, music-related feel */}
